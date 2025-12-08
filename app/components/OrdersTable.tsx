@@ -2,53 +2,25 @@
 
 import { cn } from "@/app/lib/utils";
 
-const orders = [
-    {
-        id: "#OTG-98245",
-        type: "Wi-Fi",
-        subType: "Coffee",
-        customer: { name: "Sophia Williams", handle: "@sophie", avatar: "SW" },
-        amount: "₦12,500",
-        date: "28 Jan, 09:20",
-    },
-    {
-        id: "#OTG-98245",
-        type: "Wi-Fi",
-        subType: "Conference room",
-        extra: "+2",
-        customer: { name: "Emeka Nwafor", handle: "@emeka", avatar: "EN" },
-        amount: "₦14,200",
-        date: "28 Jan, 09:20",
-    },
-    {
-        id: "#OTG-98245",
-        type: "Wi-Fi",
-        subType: "Food",
-        extra: "Drinks",
-        customer: { name: "Chinedu Okafor", handle: "@chinedu", avatar: "CO" },
-        amount: "₦5,200",
-        date: "28 Jan, 09:20",
-    },
-    {
-        id: "#OTG-98245",
-        type: "Wi-Fi",
-        subType: "Coffee",
-        customer: { name: "Amina Bello", handle: "@amina", avatar: "AB" },
-        amount: "₦10,000",
-        date: "28 Jan, 09:20",
-    },
-    {
-        id: "#OTG-98245",
-        type: "Wi-Fi",
-        subType: "Lounge",
-        extra: "Food +1",
-        customer: { name: "Tunde Adeyemi", handle: "@tunde", avatar: "TA" },
-        amount: "₦17,500",
-        date: "28 Jan, 09:20",
-    },
-];
+interface Order {
+    id: string;
+    type: string;
+    subType: string;
+    extra?: string;
+    customer: {
+        name: string;
+        handle: string;
+        avatar: string;
+    };
+    amount: string;
+    date: string;
+}
 
-export function OrdersTable() {
+interface OrdersTableProps {
+    orders: Order[];
+}
+
+export function OrdersTable({ orders }: OrdersTableProps) {
     return (
         <div className="rounded-xl border border-gray-100 bg-white shadow-sm">
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
