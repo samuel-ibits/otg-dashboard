@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Tabs } from "@/app/components/Tabs";
 import { EmptyState } from "@/app/components/EmptyState";
 import { Search, SlidersHorizontal, MoreVertical, Plus, Download } from "lucide-react";
+import { ActionMenu } from "@/app/components/ActionMenu";
 
 // Mock Data
 const vouchers = [
@@ -102,9 +103,10 @@ export default function VouchersPage() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <button className="text-gray-400 hover:text-gray-600">
-                                                <MoreVertical className="h-4 w-4" />
-                                            </button>
+                                            <ActionMenu
+                                                onEdit={() => console.log("Edit voucher", voucher.id)}
+                                                onDelete={() => console.log("Delete voucher", voucher.id)}
+                                            />
                                         </td>
                                     </tr>
                                 ))}

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CustomerDrawer } from "@/app/components/CustomerDrawer";
 import { Search, SlidersHorizontal, MoreVertical } from "lucide-react";
+import { ActionMenu } from "@/app/components/ActionMenu";
 
 // Mock Data
 const customers = [
@@ -109,9 +110,10 @@ export default function CustomersPage() {
                                     <td className="px-6 py-4 text-gray-900">{customer.location}</td>
                                     <td className="px-6 py-4 text-gray-900">{customer.date}</td>
                                     <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
-                                        <button className="text-gray-400 hover:text-gray-600">
-                                            <MoreVertical className="h-4 w-4" />
-                                        </button>
+                                        <ActionMenu
+                                            onEdit={() => console.log("Edit customer", customer.id)}
+                                            onDelete={() => console.log("Delete customer", customer.id)}
+                                        />
                                     </td>
                                 </tr>
                             ))}

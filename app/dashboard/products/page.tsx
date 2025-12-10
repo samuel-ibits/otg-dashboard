@@ -5,6 +5,7 @@ import { Plus, MoreVertical, Search, SlidersHorizontal, Image as ImageIcon } fro
 import { AddProductModal } from "@/app/components/AddProductModal";
 import { ProductDrawer } from "@/app/components/ProductDrawer";
 import { DeleteProductModal } from "@/app/components/DeleteProductModal";
+import { ActionMenu } from "@/app/components/ActionMenu";
 
 // Mock Data
 const products = [
@@ -61,7 +62,16 @@ export default function ProductsPage() {
                             <SlidersHorizontal className="h-4 w-4" />
                             Filters
                         </button>
+                        <div className="relative">
+                            <Search className="absolute left-2.5 top-2 h-4 w-4 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Search"
+                                className="h-8 max-w-[200px] rounded-md border border-gray-200 pl-9 pr-4 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder:text-gray-400"
+                            />
+                        </div>
                     </div>
+
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm text-gray-500">
@@ -100,9 +110,10 @@ export default function ProductsPage() {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
-                                        <button className="text-gray-400 hover:text-gray-600">
-                                            <MoreVertical className="h-4 w-4" />
-                                        </button>
+                                        <ActionMenu
+                                            onEdit={() => console.log("Edit product", product.id)}
+                                            onDelete={() => handleDeleteRequest()}
+                                        />
                                     </td>
                                 </tr>
                             ))}

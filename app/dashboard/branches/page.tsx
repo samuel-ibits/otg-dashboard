@@ -70,14 +70,13 @@ export default function BranchesPage() {
                             Filters
                         </button>
                         <div className="relative">
-                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Search className="absolute left-2.5 top-2 h-4 w-4 text-gray-400" />
                             <input
                                 type="text"
                                 placeholder="Search"
-                                className="h-8 w-64 rounded-md border border-gray-200 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                className="h-8 max-w-[200px] rounded-md border border-gray-200 pl-9 pr-4 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder:text-gray-400"
                             />
-                        </div>
-                    </div>
+                        </div> </div>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm text-gray-500">

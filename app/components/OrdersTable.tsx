@@ -2,6 +2,9 @@
 
 import { cn } from "@/app/lib/utils";
 
+import { ActionMenu } from "./ActionMenu";
+import { Search, Filter } from "lucide-react";
+
 interface Order {
     id: string;
     type: string;
@@ -25,15 +28,22 @@ export function OrdersTable({ orders }: OrdersTableProps) {
         <div className="rounded-xl border border-gray-100 bg-white shadow-sm">
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
                 <h3 className="font-semibold text-gray-900">Orders</h3>
-                <div className="flex gap-2">
-                    <button className="flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50">
+                <div className="flex gap-3">
+                    <button className="flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
+                        <Filter className="h-4 w-4" />
                         Filters
                     </button>
-                    <button className="flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50">
-                        Search
-                    </button>
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search"
+                            className="h-full w-64 rounded-lg border border-gray-200 pl-10 pr-4 text-sm outline-none placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        />
+                    </div>
                 </div>
             </div>
+
             <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm text-gray-500">
                     <thead className="bg-gray-50 text-xs uppercase text-gray-500">
@@ -81,32 +91,17 @@ export function OrdersTable({ orders }: OrdersTableProps) {
                                 <td className="px-6 py-4 font-medium text-gray-900">{order.amount}</td>
                                 <td className="px-6 py-4">{order.date}</td>
                                 <td className="px-6 py-4 text-right">
-                                    <button className="text-gray-400 hover:text-gray-600">
-                                        ...
-                                    </button>
+                                    <ActionMenu
+                                        onEdit={() => console.log("Edit order", order.id)}
+                                        onDelete={() => console.log("Delete order", order.id)}
+                                    />
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
-            <div className="flex items-center justify-between border-t border-gray-100 px-6 py-4">
-                <button className="flex items-center gap-1 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50">
-                    Previous
-                </button>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <span className="font-medium text-gray-900">1</span>
-                    <span>2</span>
-                    <span>3</span>
-                    <span>...</span>
-                    <span>8</span>
-                    <span>9</span>
-                    <span>10</span>
-                </div>
-                <button className="flex items-center gap-1 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50">
-                    Next
-                </button>
-            </div>
+            {/* ... (existing footer) */}
         </div>
     );
 }
