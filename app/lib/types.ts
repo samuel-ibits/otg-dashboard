@@ -187,28 +187,71 @@ export interface UpdateCustomerDTO extends Partial<CreateCustomerDTO> {
 // Branch Types
 // ============================================
 
+export interface WorkingHours {
+    open: string | null;
+    close: string | null;
+}
+
+export interface BranchStaff {
+    fullName: string;
+    email: string;
+    role: 'admin' | 'receptionist' | 'cashier' | string;
+}
+
 export interface Branch {
-    id: string | number;
+    id: string;
     name: string;
-    address: string;
-    phone: string;
-    email?: string;
-    manager?: string;
-    status: 'active' | 'inactive';
+    fullAddress: string;
+    description?: string;
+    streetAddress: string;
+    state: string;
+    country: string;
+    city: string;
+    working_hours: {
+        monday: WorkingHours;
+        tuesday: WorkingHours;
+        wednesday: WorkingHours;
+        thursday: WorkingHours;
+        friday: WorkingHours;
+        saturday: WorkingHours;
+        sunday: WorkingHours;
+    };
+    amenities: string[];
+    staff: BranchStaff[];
+    status?: 'active' | 'inactive';
     createdAt?: string;
     updatedAt?: string;
 }
 
 export interface CreateBranchDTO {
     name: string;
-    address: string;
-    phone: string;
-    email?: string;
-    manager?: string;
+    fullAddress: string;
+    description?: string;
+    streetAddress: string;
+    state: string;
+    country: string;
+    city: string;
+    working_hours: {
+        monday: WorkingHours;
+        tuesday: WorkingHours;
+        wednesday: WorkingHours;
+        thursday: WorkingHours;
+        friday: WorkingHours;
+        saturday: WorkingHours;
+        sunday: WorkingHours;
+    };
+    amenities: string[];
+    staff: BranchStaff[];
 }
 
 export interface UpdateBranchDTO extends Partial<CreateBranchDTO> {
     status?: 'active' | 'inactive';
+}
+
+export interface BranchQueryParams extends PaginationParams {
+    search?: string;
+    cursor?: string;
+    limit?: number;
 }
 
 // ============================================
