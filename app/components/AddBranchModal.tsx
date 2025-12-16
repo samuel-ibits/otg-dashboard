@@ -134,7 +134,7 @@ export function AddBranchModal({ isOpen, onClose, onSuccess }: AddBranchModalPro
                                     value={formData.name}
                                     onChange={(e) => handleChange("name", e.target.value)}
                                     placeholder="e.g., Victoria Island Branch"
-                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                                 />
                             </div>
 
@@ -148,7 +148,7 @@ export function AddBranchModal({ isOpen, onClose, onSuccess }: AddBranchModalPro
                                     value={formData.fullAddress}
                                     onChange={(e) => handleChange("fullAddress", e.target.value)}
                                     placeholder="e.g., 23 Awolowo Road, Victoria Island, Lagos"
-                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                                 />
                             </div>
 
@@ -162,7 +162,7 @@ export function AddBranchModal({ isOpen, onClose, onSuccess }: AddBranchModalPro
                                     value={formData.streetAddress}
                                     onChange={(e) => handleChange("streetAddress", e.target.value)}
                                     placeholder="e.g., 23 Awolowo Road"
-                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                                 />
                             </div>
 
@@ -176,7 +176,7 @@ export function AddBranchModal({ isOpen, onClose, onSuccess }: AddBranchModalPro
                                     value={formData.city}
                                     onChange={(e) => handleChange("city", e.target.value)}
                                     placeholder="e.g., Victoria Island"
-                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                                 />
                             </div>
 
@@ -190,7 +190,7 @@ export function AddBranchModal({ isOpen, onClose, onSuccess }: AddBranchModalPro
                                     value={formData.state}
                                     onChange={(e) => handleChange("state", e.target.value)}
                                     placeholder="e.g., Lagos"
-                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                                 />
                             </div>
 
@@ -204,7 +204,7 @@ export function AddBranchModal({ isOpen, onClose, onSuccess }: AddBranchModalPro
                                     value={formData.country}
                                     onChange={(e) => handleChange("country", e.target.value)}
                                     placeholder="Nigeria"
-                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                                 />
                             </div>
 
@@ -217,7 +217,7 @@ export function AddBranchModal({ isOpen, onClose, onSuccess }: AddBranchModalPro
                                     onChange={(e) => handleChange("description", e.target.value)}
                                     placeholder="Brief description of the branch"
                                     rows={2}
-                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                                 />
                             </div>
 
@@ -234,7 +234,7 @@ export function AddBranchModal({ isOpen, onClose, onSuccess }: AddBranchModalPro
                                     value={formData.adminName}
                                     onChange={(e) => handleChange("adminName", e.target.value)}
                                     placeholder="e.g., Alice Johnson"
-                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                                 />
                             </div>
 
@@ -247,7 +247,7 @@ export function AddBranchModal({ isOpen, onClose, onSuccess }: AddBranchModalPro
                                     value={formData.adminEmail}
                                     onChange={(e) => handleChange("adminEmail", e.target.value)}
                                     placeholder="e.g., alice@example.com"
-                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                                 />
                             </div>
                         </div>

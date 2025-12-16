@@ -219,8 +219,8 @@ export interface Branch {
     amenities: string[];
     staff: BranchStaff[];
     status?: 'active' | 'inactive';
-    createdAt?: string;
-    updatedAt?: string;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export interface CreateBranchDTO {

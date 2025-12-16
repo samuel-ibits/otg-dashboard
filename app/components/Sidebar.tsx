@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
     LayoutDashboard,
     Users,
@@ -16,10 +16,12 @@ import {
     LogOut,
     ChevronsUpDown,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    User
 } from "lucide-react";
 import { cn } from "@/app/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { authService } from "@/app/lib/services/authService";
 
 const sidebarItems = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -35,7 +37,29 @@ const sidebarItems = [
 
 export function Sidebar() {
     const pathname = usePathname();
+    const router = useRouter();
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [user, setUser] = useState<any>(null);
+
+    useEffect(() => {
+        // Get user data from auth service
+        const userData = authService.getUser();
+        setUser(userData);
+    }, []);
+
+    const handleLogout = async () => {
+        await authService.logout();
+        router.push("/");
+    };
+
+    const getInitials = (name?: string) => {
+        if (!name) return "U";
+        const parts = name.split(" ");
+        if (parts.length >= 2) {
+            return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+        }
+        return name.substring(0, 2).toUpperCase();
+    };
 
     return (
         <div
@@ -65,8 +89,8 @@ export function Sidebar() {
                         </div>
                         {!isCollapsed && (
                             <div className="flex flex-col min-w-0">
-                                <span className="font-semibold text-gray-900 text-sm truncate">Cafe One - Lekki</span>
-                                <span className="text-xs text-gray-400 truncate">Enterprise</span>
+                                <span className="font-semibold text-gray-900 text-sm truncate">OnTheGo Africa</span>
+                                <span className="text-xs text-gray-400 truncate">Dashboard</span>
                             </div>
                         )}
                     </div>
@@ -112,8 +136,9 @@ export function Sidebar() {
                     {!isCollapsed && <span>Settings</span>}
                 </Link>
                 <button
+                    onClick={handleLogout}
                     className={cn(
-                        "flex w-full items-center gap-3 rounded-md py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-colors",
+                        "flex w-full items-center gap-3 rounded-md py-2 text-sm font-medium text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors",
                         isCollapsed ? "justify-center px-2" : "px-3"
                     )}
                     title={isCollapsed ? "Log out" : undefined}
@@ -123,13 +148,17 @@ export function Sidebar() {
                 </button>
 
                 <div className={cn("mt-4 flex items-center gap-3 py-2", isCollapsed ? "justify-center px-0" : "px-3")}>
-                    <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-600 shrink-0">
-                        WK
+                    <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-semibold text-blue-600 shrink-0">
+                        {user ? getInitials(user.name || user.email) : <User className="h-4 w-4" />}
                     </div>
                     {!isCollapsed && (
                         <div className="flex flex-col min-w-0">
-                            <span className="text-sm font-medium text-gray-900 truncate">William Kayode</span>
-                            <span className="text-xs text-gray-500 truncate">kayode@cafeone.com</span>
+                            <span className="text-sm font-medium text-gray-900 truncate">
+                                {user?.name || user?.email || "User"}
+                            </span>
+                            <span className="text-xs text-gray-500 truncate">
+                                {user?.email || "Loading..."}
+                            </span>
                         </div>
                     )}
                 </div>

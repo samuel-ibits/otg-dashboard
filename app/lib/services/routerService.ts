@@ -5,80 +5,80 @@
  * for router-related operations.
  */
 
-import { api, buildQueryString, APIResponse } from './api';
+import { api, buildQueryString, APIResponse } from '../api';
 import type {
-    Router,
-    CreateRouterDTO,
-    UpdateRouterDTO,
-    PaginationParams,
-    PaginatedResponse,
-} from './types';
+  Router,
+  CreateRouterDTO,
+  UpdateRouterDTO,
+  PaginationParams,
+  PaginatedResponse,
+} from '../types';
 
 const ROUTER_ENDPOINTS = {
-    base: '/routers',
-    byId: (id: string | number) => `/routers/${id}`,
-    toggle: (id: string | number) => `/routers/${id}/toggle`,
-    connections: (id: string | number) => `/routers/${id}/connections`,
+  base: '/routers',
+  byId: (id: string | number) => `/routers/${id}`,
+  toggle: (id: string | number) => `/routers/${id}/toggle`,
+  connections: (id: string | number) => `/routers/${id}/connections`,
 };
 
 export const routerService = {
-    /**
-     * Get all routers with optional pagination
-     */
-    async getAll(
-        params?: PaginationParams
-    ): Promise<APIResponse<PaginatedResponse<Router>>> {
-        const queryString = params ? buildQueryString(params) : '';
-        return api.get(`${ROUTER_ENDPOINTS.base}${queryString}`);
-    },
+  /**
+   * Get all routers with optional pagination
+   */
+  async getAll(
+    params?: PaginationParams
+  ): Promise<APIResponse<PaginatedResponse<Router>>> {
+    const queryString = params ? buildQueryString(params) : '';
+    return api.get(`${ROUTER_ENDPOINTS.base}${queryString}`);
+  },
 
-    /**
-     * Get a single router by ID
-     */
-    async getById(id: string | number): Promise<APIResponse<Router>> {
-        return api.get(ROUTER_ENDPOINTS.byId(id));
-    },
+  /**
+   * Get a single router by ID
+   */
+  async getById(id: string | number): Promise<APIResponse<Router>> {
+    return api.get(ROUTER_ENDPOINTS.byId(id));
+  },
 
-    /**
-     * Create a new router
-     */
-    async create(data: CreateRouterDTO): Promise<APIResponse<Router>> {
-        return api.post(ROUTER_ENDPOINTS.base, data);
-    },
+  /**
+   * Create a new router
+   */
+  async create(data: CreateRouterDTO): Promise<APIResponse<Router>> {
+    return api.post(ROUTER_ENDPOINTS.base, data);
+  },
 
-    /**
-     * Update an existing router
-     */
-    async update(
-        id: string | number,
-        data: UpdateRouterDTO
-    ): Promise<APIResponse<Router>> {
-        return api.put(ROUTER_ENDPOINTS.byId(id), data);
-    },
+  /**
+   * Update an existing router
+   */
+  async update(
+    id: string | number,
+    data: UpdateRouterDTO
+  ): Promise<APIResponse<Router>> {
+    return api.put(ROUTER_ENDPOINTS.byId(id), data);
+  },
 
-    /**
-     * Delete a router
-     */
-    async delete(id: string | number): Promise<APIResponse<void>> {
-        return api.delete(ROUTER_ENDPOINTS.byId(id));
-    },
+  /**
+   * Delete a router
+   */
+  async delete(id: string | number): Promise<APIResponse<void>> {
+    return api.delete(ROUTER_ENDPOINTS.byId(id));
+  },
 
-    /**
-     * Toggle router status (on/off)
-     */
-    async toggleStatus(
-        id: string | number,
-        status: boolean
-    ): Promise<APIResponse<Router>> {
-        return api.patch(ROUTER_ENDPOINTS.toggle(id), { status });
-    },
+  /**
+   * Toggle router status (on/off)
+   */
+  async toggleStatus(
+    id: string | number,
+    status: boolean
+  ): Promise<APIResponse<Router>> {
+    return api.patch(ROUTER_ENDPOINTS.toggle(id), { status });
+  },
 
-    /**
-     * Get router connection details
-     */
-    async getConnections(id: string | number): Promise<APIResponse<any>> {
-        return api.get(ROUTER_ENDPOINTS.connections(id));
-    },
+  /**
+   * Get router connection details
+   */
+  async getConnections(id: string | number): Promise<APIResponse<any>> {
+    return api.get(ROUTER_ENDPOINTS.connections(id));
+  },
 };
 
 /**

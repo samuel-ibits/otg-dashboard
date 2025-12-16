@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, MoreVertical, Search, SlidersHorizontal } from "lucide-react";
+import { Plus, MoreVertical, Search, SlidersHorizontal, Download } from "lucide-react";
 import { AddBranchModal } from "@/app/components/AddBranchModal";
 import { BranchActionModal } from "@/app/components/BranchActionModals";
 import { useRouter } from "next/navigation";
 import { branchService } from "@/app/lib/services/branchService";
 import type { Branch } from "@/app/lib/types";
+import * as XLSX from 'xlsx';
 
 export default function BranchesPage() {
     const [branches, setBranches] = useState<Branch[]>([]);
@@ -33,7 +34,7 @@ export default function BranchesPage() {
             });
 
             if (response.success && response.data) {
-                setBranches(response.data.data || []);
+                setBranches((response.data as any).branches || []);
             } else {
                 setError(response.error || "Failed to load branches");
             }
@@ -122,6 +123,58 @@ export default function BranchesPage() {
         return admin?.fullName || "N/A";
     };
 
+    const exportToExcel = () => {
+        if (branches.length === 0) {
+            alert("No data to export");
+            return;
+        }
+
+        // Prepare data for export
+        const exportData = branches.map((branch, index) => ({
+            'S/N': index + 1,
+            'Branch Name': branch.name,
+            'Admin': getAdminName(branch),
+            'Location': `${branch.city}, ${branch.state}`,
+            'Full Address': branch.fullAddress,
+            'Street Address': branch.streetAddress,
+            'Country': branch.country,
+            'Description': branch.description || 'N/A',
+            'Status': branch.status === 'active' ? 'Active' : 'Inactive',
+            'Date Created': formatDate(branch.created_at),
+            'Staff Count': branch.staff?.length || 0,
+        }));
+
+        // Create worksheet
+        const ws = XLSX.utils.json_to_sheet(exportData);
+
+        // Set column widths
+        const colWidths = [
+            { wch: 5 },  // S/N
+            { wch: 25 }, // Branch Name
+            { wch: 20 }, // Admin
+            { wch: 20 }, // Location
+            { wch: 40 }, // Full Address
+            { wch: 25 }, // Street Address
+            { wch: 15 }, // Country
+            { wch: 30 }, // Description
+            { wch: 10 }, // Status
+            { wch: 15 }, // Date Created
+            { wch: 12 }, // Staff Count
+        ];
+        ws['!cols'] = colWidths;
+
+        // Create workbook
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Branches');
+
+        // Generate filename with current date
+        const date = new Date().toISOString().split('T')[0];
+        const filename = `branches_export_${date}.xlsx`;
+
+        // Export file
+        XLSX.writeFile(wb, filename);
+    };
+
     return (
         <div className="space-y-6" onClick={() => setActiveActionId(null)}>
             <div className="flex items-center justify-between">
@@ -130,8 +183,11 @@ export default function BranchesPage() {
                     <p className="text-sm text-gray-500">Manage and monitor branches activity</p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="flex items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
-                        <SlidersHorizontal className="h-4 w-4" />
+                    <button
+                        onClick={exportToExcel}
+                        className="flex items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+                    >
+                        <Download className="h-4 w-4" />
                         Export
                     </button>
                     <button
@@ -154,13 +210,13 @@ export default function BranchesPage() {
                             Filters
                         </button>
                         <div className="relative">
-                            <Search className="absolute left-2.5 top-2 h-4 w-4 text-gray-400" />
+                            <Search className="absolute left-2.5 top-2 h-4 w-4 text-gray-900" />
                             <input
                                 type="text"
                                 placeholder="Search branches..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="h-8 max-w-[200px] rounded-md border border-gray-200 pl-9 pr-4 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder:text-gray-400"
+                                className="h-8 max-w-[200px] rounded-md border border-gray-200 pl-9 pr-4 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-900 placeholder:text-black"
                             />
                         </div>
                     </div>
@@ -226,7 +282,7 @@ export default function BranchesPage() {
                                         <td className="px-6 py-4 font-medium text-gray-900">{branch.name}</td>
                                         <td className="px-6 py-4">{getAdminName(branch)}</td>
                                         <td className="px-6 py-4">{branch.city}, {branch.state}</td>
-                                        <td className="px-6 py-4">{formatDate(branch.createdAt)}</td>
+                                        <td className="px-6 py-4">{formatDate(branch.created_at)}</td>
                                         <td className="px-6 py-4">
                                             <div className={`flex items-center gap-1.5 ${branch.status === 'active' ? 'text-green-600' : 'text-gray-400'}`}>
                                                 <div className={`h-1.5 w-1.5 rounded-full ${branch.status === 'active' ? 'bg-green-600' : 'bg-gray-400'}`}></div>
