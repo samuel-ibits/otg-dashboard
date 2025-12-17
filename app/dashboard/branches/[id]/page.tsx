@@ -8,6 +8,12 @@ import { cn } from "@/app/lib/utils";
 import { BranchActionModal } from "@/app/components/BranchActionModals";
 import { branchService } from "@/app/lib/services/branchService";
 import type { Branch } from "@/app/lib/types";
+import { OrdersTable } from "@/app/components/OrdersTable";
+import { BranchProducts } from "@/app/components/BranchProducts";
+import { BranchWiFi } from "@/app/components/BranchWiFi";
+import { ActivityLog } from "@/app/components/ActivityLog";
+import { BranchGallery } from "@/app/components/BranchGallery";
+import { BranchReviews } from "@/app/components/BranchReviews";
 
 interface BranchDetailsPageProps {
     params: Promise<{
@@ -273,6 +279,7 @@ export default function BranchDetailsPage({ params }: BranchDetailsPageProps) {
                         ))}
                     </div>
                 </div>
+                {/* subtabs */}
                 <div className="p-6">
                     {activeTab === "Admin & Staff" && (
                         <div>
@@ -297,13 +304,36 @@ export default function BranchDetailsPage({ params }: BranchDetailsPageProps) {
                             ) : (
                                 <p className="text-sm text-gray-500 text-center py-8">No staff members assigned</p>
                             )}
+                            {/* Existing Admin & Staff content or placeholder from previous snippet */}
+                            <div className="min-h-[300px] flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-100 rounded-lg">
+                                Admin & Staff List
+                            </div>
                         </div>
                     )}
-
-                    {activeTab !== "Admin & Staff" && (
-                        <div className="min-h-[300px] flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-100 rounded-lg">
-                            {activeTab} Content
+                    {activeTab === "Orders" && (
+                        <div className="min-h-[300px]">
+                            {/* Assuming OrdersTable handles mock data if branch.orders is undefined for now */}
+                            <OrdersTable orders={[]} />
                         </div>
+                    )}
+                    {activeTab === "Wi-Fi Infrastructure" && (
+                        <div className="min-h-[300px]">
+                            <BranchWiFi />
+                        </div>
+                    )}
+                    {activeTab === "Products & Amenities" && (
+                        <div className="min-h-[300px]">
+                            <BranchProducts />
+                        </div>
+                    )}
+                    {activeTab === "Activity log" && (
+                        <ActivityLog />
+                    )}
+                    {activeTab === "Pictures" && (
+                        <BranchGallery />
+                    )}
+                    {activeTab === "Reviews" && (
+                        <BranchReviews />
                     )}
                 </div>
             </div>
