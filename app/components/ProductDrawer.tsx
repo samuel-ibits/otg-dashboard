@@ -78,7 +78,7 @@ export function ProductDrawer({ isOpen, onClose, product, onDelete }: ProductDra
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                                <textarea rows={4} defaultValue="A spacious hall for your events..." className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                                <textarea rows={4} defaultValue={product?.description || ""} className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                             </div>
                         </div>
                     )}

@@ -49,6 +49,7 @@ async function fetchWithConfig<T>(
         ...options,
         headers: {
             ...API_CONFIG.headers,
+            ...getAuthHeader(), // Automatically attach auth header
             ...options.headers,
         },
     };

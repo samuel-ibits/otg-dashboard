@@ -94,11 +94,13 @@ export interface UpdateSubscriptionDTO extends Partial<CreateSubscriptionDTO> {
 export interface Product {
     id: string | number;
     name: string;
+    branchAmenityId: string;
+    description: string;
+    price: string | number;
+    meta: Record<string, any>;
     category: string;
-    price: number;
     stock: number;
     status: 'active' | 'inactive';
-    description?: string;
     imageUrl?: string;
     createdAt?: string;
     updatedAt?: string;
@@ -106,10 +108,12 @@ export interface Product {
 
 export interface CreateProductDTO {
     name: string;
-    category: string;
-    price: number;
-    stock: number;
-    description?: string;
+    branchAmenityId: string;
+    description: string;
+    price: string | number;
+    meta: Record<string, any>;
+    category?: string;
+    stock?: number;
     imageUrl?: string;
 }
 
@@ -242,6 +246,20 @@ export interface CreateBranchDTO {
     };
     amenities: string[];
     staff: BranchStaff[];
+}
+
+export interface Amenity {
+    id: string;
+    name: string;
+    description?: string;
+    icon?: string;
+}
+
+export enum BranchStaffRole {
+    ADMIN = "admin",
+    RECEPTIONIST = "receptionist",
+    WAITER = "waiter",
+    CASHIER = "cashier",
 }
 
 export interface UpdateBranchDTO extends Partial<CreateBranchDTO> {

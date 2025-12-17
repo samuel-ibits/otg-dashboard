@@ -1,36 +1,76 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, MoreVertical, Search, SlidersHorizontal, Image as ImageIcon } from "lucide-react";
 import { AddProductModal } from "@/app/components/AddProductModal";
 import { ProductDrawer } from "@/app/components/ProductDrawer";
 import { DeleteProductModal } from "@/app/components/DeleteProductModal";
 import { ActionMenu } from "@/app/components/ActionMenu";
-
-// Mock Data
-const products = [
-    { id: 1, name: "King Food Burger", price: "₦5,000", type: "Food", created: "28 Jan 2025", status: "Available" },
-    { id: 2, name: "King Food Burger", price: "₦5,000", type: "Food", created: "28 Jan 2025", status: "Available" },
-    { id: 3, name: "King Food Burger", price: "₦5,000", type: "Food", created: "28 Jan 2025", status: "Available" },
-    { id: 4, name: "King Food Burger", price: "₦12,000", type: "Conference space", created: "28 Jan 2025", status: "Available" },
-    { id: 5, name: "King Food Burger", price: "₦5,000", type: "Lounge", created: "28 Jan 2025", status: "Available" },
-    { id: 6, name: "King Food Burger", price: "₦12,000", type: "Conference hall", created: "28 Jan 2025", status: "Available" },
-    { id: 7, name: "King Food Burger", price: "₦5,000", type: "Food", created: "28 Jan 2025", status: "Available" },
-    { id: 8, name: "King Food Burger", price: "₦5,000", type: "Food", created: "28 Jan 2025", status: "Available" },
-];
+import { productService } from "@/app/lib/services/productService";
+import type { Product } from "@/app/lib/types";
 
 export default function ProductsPage() {
+    const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState<any>(null);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-    const handleRowClick = (product: any) => {
+    const fetchProducts = async () => {
+        setLoading(true);
+        try {
+            const response = await productService.getAll();
+            if (response.success && response.data) {
+                // Determine if response.data is PaginatedResponse or array
+                // The API helper might return it differently depending on service implementation
+                // Assuming it returns PaginatedResponse based on types, but let's check structure safe
+                if (Array.isArray(response.data)) {
+                    setProducts(response.data);
+                } else if ('data' in response.data && Array.isArray((response.data as any).data)) {
+                    setProducts((response.data as any).data);
+                } else {
+                    setProducts([]);
+                }
+            } else {
+                setError(response.error || "Failed to load products");
+            }
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "An error occurred");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    const handleRowClick = (product: Product) => {
         setSelectedProduct(product);
     };
 
     const handleDeleteRequest = () => {
-        // Close drawer if open, or called directly
         setIsDeleteModalOpen(true);
+        // We keep selectedProduct set so we know what to delete
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!selectedProduct) return;
+
+        try {
+            const response = await productService.delete(selectedProduct.id);
+            if (response.success) {
+                setProducts(prev => prev.filter(p => p.id !== selectedProduct.id));
+                setSelectedProduct(null);
+                setIsDeleteModalOpen(false);
+            } else {
+                alert("Failed to delete product: " + response.error);
+            }
+        } catch (error) {
+            alert("Error deleting product");
+        }
     };
 
     return (
@@ -58,6 +98,7 @@ export default function ProductsPage() {
                 <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
                     <h3 className="font-semibold text-gray-900">Products & Amenities</h3>
                     <div className="flex gap-2">
+                        {/* Search & Filter - functionality can be added later */}
                         <button className="flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50">
                             <SlidersHorizontal className="h-4 w-4" />
                             Filters
@@ -71,80 +112,102 @@ export default function ProductsPage() {
                             />
                         </div>
                     </div>
+                </div>
 
-                </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-gray-500">
-                        <thead className="bg-gray-50 text-xs uppercase text-gray-500">
-                            <tr>
-                                <th className="px-6 py-3 font-medium">Product name</th>
-                                <th className="px-6 py-3 font-medium">Price</th>
-                                <th className="px-6 py-3 font-medium">Product Type</th>
-                                <th className="px-6 py-3 font-medium">Date Created</th>
-                                <th className="px-6 py-3 font-medium">Status</th>
-                                <th className="px-6 py-3 font-medium"></th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                            {products.map((product) => (
-                                <tr
-                                    key={product.id}
-                                    className="hover:bg-gray-50 cursor-pointer transition-colors"
-                                    onClick={() => handleRowClick(product)}
-                                >
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
-                                                <ImageIcon className="h-5 w-5 text-gray-400" />
-                                            </div>
-                                            <span className="font-medium text-gray-900">{product.name}</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 font-medium text-gray-900">{product.price}</td>
-                                    <td className="px-6 py-4">{product.type}</td>
-                                    <td className="px-6 py-4">{product.created}</td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-1.5 text-green-600">
-                                            <div className="h-1.5 w-1.5 rounded-full bg-green-600"></div>
-                                            <span className="text-xs font-medium">{product.status}</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
-                                        <ActionMenu
-                                            onEdit={() => console.log("Edit product", product.id)}
-                                            onDelete={() => handleDeleteRequest()}
-                                        />
-                                    </td>
+                {loading ? (
+                    <div className="p-12 flex justify-center text-gray-500">Loading products...</div>
+                ) : error ? (
+                    <div className="p-12 flex justify-center text-red-500">{error}</div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left text-sm text-gray-500">
+                            <thead className="bg-gray-50 text-xs uppercase text-gray-500">
+                                <tr>
+                                    <th className="px-6 py-3 font-medium">Product name</th>
+                                    <th className="px-6 py-3 font-medium">Price</th>
+                                    <th className="px-6 py-3 font-medium">Category</th>
+                                    <th className="px-6 py-3 font-medium">Date Created</th>
+                                    <th className="px-6 py-3 font-medium">Status</th>
+                                    <th className="px-6 py-3 font-medium"></th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-                <div className="flex items-center justify-between border-t border-gray-100 px-6 py-4">
-                    <button className="flex items-center gap-1 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50">
-                        Previous
-                    </button>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <span className="font-medium text-gray-900">1</span>
-                        <span>2</span>
-                        <span>3</span>
-                        <span>...</span>
-                        <span>9</span>
-                        <span>10</span>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {products.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                                            No products found. Click "Add Product" to get started.
+                                        </td>
+                                    </tr>
+                                ) : products.map((product) => (
+                                    <tr
+                                        key={product.id}
+                                        className="hover:bg-gray-50 cursor-pointer transition-colors"
+                                        onClick={() => handleRowClick(product)}
+                                    >
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
+                                                    {product.imageUrl ? (
+                                                        <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
+                                                    ) : (
+                                                        <ImageIcon className="h-5 w-5 text-gray-400" />
+                                                    )}
+                                                </div>
+                                                <span className="font-medium text-gray-900">{product.name}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 font-medium text-gray-900">₦{Number(product.price).toLocaleString()}</td>
+                                        <td className="px-6 py-4">{product.category || '-'}</td>
+                                        <td className="px-6 py-4">{product.createdAt ? new Date(product.createdAt).toLocaleDateString() : '-'}</td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-1.5 text-green-600">
+                                                <div className="h-1.5 w-1.5 rounded-full bg-green-600"></div>
+                                                <span className="text-xs font-medium">{product.status || 'active'}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
+                                            <ActionMenu
+                                                onEdit={() => handleRowClick(product)}
+                                                onDelete={() => {
+                                                    setSelectedProduct(product);
+                                                    handleDeleteRequest();
+                                                }}
+                                            />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
-                    <button className="flex items-center gap-1 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50">
-                        Next
-                    </button>
-                </div>
+                )}
+
+                {/* Pagination Omitted for now, relying on all items or first page */}
+                {!loading && !error && products.length > 0 && (
+                    <div className="flex items-center justify-between border-t border-gray-100 px-6 py-4">
+                        <button className="flex items-center gap-1 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50">
+                            Previous
+                        </button>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <span className="font-medium text-gray-900">1</span>
+                        </div>
+                        <button className="flex items-center gap-1 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50">
+                            Next
+                        </button>
+                    </div>
+                )}
             </div>
 
             <AddProductModal
                 isOpen={isAddModalOpen}
                 onClose={() => setIsAddModalOpen(false)}
+                onSuccess={() => {
+                    setIsAddModalOpen(false);
+                    fetchProducts();
+                }}
             />
 
             <ProductDrawer
-                isOpen={!!selectedProduct}
+                isOpen={!!selectedProduct && !isDeleteModalOpen}
                 onClose={() => setSelectedProduct(null)}
                 product={selectedProduct}
                 onDelete={handleDeleteRequest}
@@ -153,10 +216,7 @@ export default function ProductsPage() {
             <DeleteProductModal
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
-                onConfirm={() => {
-                    console.log("Deleted");
-                    setSelectedProduct(null); // Close drawer as well
-                }}
+                onConfirm={handleConfirmDelete}
             />
         </div>
     );
