@@ -14,6 +14,7 @@ import { BranchWiFi } from "@/app/components/BranchWiFi";
 import { ActivityLog } from "@/app/components/ActivityLog";
 import { BranchGallery } from "@/app/components/BranchGallery";
 import { BranchReviews } from "@/app/components/BranchReviews";
+import { BranchStats } from "@/app/components/BranchStats";
 
 interface BranchDetailsPageProps {
     params: Promise<{
@@ -41,6 +42,8 @@ export default function BranchDetailsPage({ params }: BranchDetailsPageProps) {
     const [reviewStats, setReviewStats] = useState<BranchReviewStats | undefined>(undefined);
     const [ratingDistribution, setRatingDistribution] = useState<RatingDistribution | undefined>(undefined);
     const [subTabLoading, setSubTabLoading] = useState(false);
+    const [chartData, setChartData] = useState<any>(null);
+    const [stats, setStats] = useState<any>(null);
 
     const tabs = ["Orders", "Wi-Fi Infrastructure", "Products & Amenities", "Admin & Staff", "Activity log", "Pictures", "Reviews"];
 
@@ -54,6 +57,8 @@ export default function BranchDetailsPage({ params }: BranchDetailsPageProps) {
 
                 if (response.success && response.data) {
                     setBranch(response.data.branchInfo);
+                    setChartData(response.data.chartData);
+                    setStats(response.data.stats);
                 } else {
                     setError(response.error || "Failed to load branch");
                 }
@@ -290,12 +295,27 @@ export default function BranchDetailsPage({ params }: BranchDetailsPageProps) {
                                 <Calendar className="h-4 w-4 mt-0.5" />
                                 <span>Created Date</span>
                             </div>
-                            <p className="pl-6 text-sm font-medium text-gray-900">{formatDate(branch.created_at)}</p>
+                            <p className="pl-6 text-sm font-medium text-gray-900">{formatDate(branch.registrationDate)}</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="col-span-2 space-y-4">
+                <div className="col-span-2 space-y-6">
+                    {/* Stats & Charts */}
+                    <BranchStats
+                        revenue={stats?.totalRevenue}
+                        activeCustomers={stats?.activeCustomers}
+                        wifiSessions={stats?.activeWifiSessions}
+                        growth={
+                            {
+                                revenue: stats?.revenueGrowth,
+                                customers: stats?.customerGrowth,
+                                wifi: stats?.wifiGrowth
+                            }}
+                        chartData={chartData}
+
+                    />
+
                     {/* Description */}
                     {branch.description && (
                         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
