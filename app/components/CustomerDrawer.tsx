@@ -37,7 +37,7 @@ export function CustomerDrawer({ isOpen, onClose, customer }: CustomerDrawerProp
                         </div>
                         <div>
                             <h2 className="text-lg font-bold text-gray-900">{customer.name}</h2>
-                            <p className="text-sm text-gray-500">{customer.email}</p>
+                            <p className="text-sm text-gray-500">Customer hasn&apos;t placed any orders yet.</p>
                         </div>
                     </div>
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
@@ -172,7 +172,7 @@ export function CustomerDrawer({ isOpen, onClose, customer }: CustomerDrawerProp
                                 </div>
                                 <div className="flex text-yellow-400 text-xs mb-2">★★★★★</div>
                                 <p className="text-sm text-gray-600 leading-relaxed">
-                                    The food is one of the best I've tasted so far. An amazing fresh menu for all dietary needs... <span className="text-blue-600 cursor-pointer">see less</span>
+                                    The food is one of the best I&apos;ve tasted so far. An amazing fresh menu for all dietary needs... <span className="text-blue-600 cursor-pointer">see less</span>
                                 </p>
                                 <div className="grid grid-cols-3 gap-2 mt-4">
                                     <div className="aspect-square bg-gray-200 rounded-lg"></div>

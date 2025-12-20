@@ -18,6 +18,9 @@ import type {
   BranchReviewsData,
   BranchWifiPlan,
   Product,
+  BranchDashboardStats,
+  ChartData,
+  BranchStaff,
 } from '../types';
 
 const BRANCH_ENDPOINTS = {
@@ -30,6 +33,7 @@ const BRANCH_ENDPOINTS = {
   activityLogs: '/branches/activity-logs',
   media: '/branches/media',
   reviews: '/branches/reviews',
+  staffs: '/branches/staff',
 };
 
 export const branchService = {
@@ -54,7 +58,7 @@ export const branchService = {
    * @param id - Branch ID
    * @returns Promise with branch data
    */
-  async getById(id: string): Promise<APIResponse<Branch>> {
+  async getById(id: string): Promise<APIResponse<{ branchInfo: Branch; stats: BranchDashboardStats; chartData: ChartData[] }>> {
     return api.get(BRANCH_ENDPOINTS.byId(id), {
       headers: getAuthHeader(),
     });
@@ -130,7 +134,7 @@ export const branchService = {
   /**
    * Get branch Wi-Fi infrastructure
    */
-  async getWifiInfrastructure(branchId: string): Promise<APIResponse<BranchWifiPlan[]>> {
+  async getWifiInfrastructure(branchId: string): Promise<APIResponse<{ wifiPlans: BranchWifiPlan[] }>> {
     return api.get(`${BRANCH_ENDPOINTS.wifi(branchId)}?branchId=${branchId}`, {
       headers: getAuthHeader(),
     });
@@ -149,7 +153,7 @@ export const branchService = {
   /**
    * Get branch activity logs
    */
-  async getActivityLogs(branchId: string): Promise<APIResponse<BranchActivityLog[]>> {
+  async getActivityLogs(branchId: string): Promise<APIResponse<{ logs: BranchActivityLog[] }>> {
     return api.get(`${BRANCH_ENDPOINTS.activityLogs}?branchId=${branchId}`, {
       headers: getAuthHeader(),
     });
@@ -158,7 +162,7 @@ export const branchService = {
   /**
    * Get branch media
    */
-  async getMedia(branchId: string): Promise<APIResponse<BranchMedia[]>> {
+  async getMedia(branchId: string): Promise<APIResponse<{ media: BranchMedia[] }>> {
     return api.get(`${BRANCH_ENDPOINTS.media}?branchId=${branchId}`, {
       headers: getAuthHeader(),
     });
@@ -172,8 +176,14 @@ export const branchService = {
       headers: getAuthHeader(),
     });
   },
-};
 
+  // get staff
+  async getStaff(branchId: string): Promise<APIResponse<{ staff: BranchStaff[] }>> {
+    return api.get(`${BRANCH_ENDPOINTS.staffs}?branchId=${branchId}`, {
+      headers: getAuthHeader(),
+    });
+  }
+};
 /**
  * React Hook for managing branches
  *

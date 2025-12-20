@@ -15,6 +15,7 @@ export interface PaginationParams {
 
 export interface PaginatedResponse<T> {
     data: T[];
+    products: T[];
     pagination: {
         currentPage: number;
         totalPages: number;
@@ -104,6 +105,9 @@ export interface Product {
     imageUrl?: string;
     createdAt?: string;
     updatedAt?: string;
+    branch_amenity?: {
+        amenityName: string;
+    };
 }
 
 export interface CreateProductDTO {
@@ -225,6 +229,32 @@ export interface Branch {
     status?: 'active' | 'inactive';
     created_at?: string;
     updated_at?: string;
+    registrationDate?: string;
+}
+
+export interface BranchActivityLog {
+    id: string | number;
+    type: string;
+    title: string;
+    description?: string;
+    meta?: string;
+    timestamp: string;
+}
+
+export interface ChartData {
+    name: string;
+    value?: number;
+    type?: string;
+    k?: number;
+}
+
+export interface BranchDashboardStats {
+    totalRevenue: number;
+    activeCustomers: number;
+    activeWifiSessions: number;
+    revenueGrowth: number;
+    customerGrowth: number;
+    wifiGrowth: number;
 }
 
 export interface CreateBranchDTO {
@@ -270,6 +300,54 @@ export interface BranchQueryParams extends PaginationParams {
     search?: string;
     cursor?: string;
     limit?: number;
+}
+
+export interface BranchMedia {
+    id: string | number;
+    url: string;
+    name: string;
+    type?: 'image' | 'video';
+}
+
+export interface BranchWifiPlan {
+    id: string | number;
+    name: string;
+    price: number | string;
+    speed: string;
+    status: string;
+    duration?: string;
+}
+
+export interface BranchReviewAuthor {
+    userName: string;
+    picture?: string;
+    totalReviews: number;
+}
+
+export interface BranchReview {
+    id: string | number;
+    author: BranchReviewAuthor;
+    rating: {
+        overall: number;
+    };
+    createdAt: string;
+    body: string;
+    media?: (string | BranchMedia)[];
+}
+
+export interface BranchReviewStats {
+    rating: number;
+    reviewCount: number;
+}
+
+export interface RatingDistribution {
+    [key: string]: number;
+}
+
+export interface BranchReviewsData {
+    reviews: BranchReview[];
+    branchStats: BranchReviewStats;
+    ratingDistribution: RatingDistribution;
 }
 
 // ============================================

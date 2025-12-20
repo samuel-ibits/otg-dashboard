@@ -135,7 +135,7 @@ export default function ProductsPage() {
                                 {products.length === 0 ? (
                                     <tr>
                                         <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                                            No products found. Click "Add Product" to get started.
+                                            No products found. Click &quot;Add Product&quot; to get started.
                                         </td>
                                     </tr>
                                 ) : products.map((product) => (

@@ -14,8 +14,9 @@ interface BranchStatsProps {
     };
     chartData?: Array<{
         name: string;
-        value: number;
-        type: "Wi-Fi" | "Other Amenities";
+        value?: number;
+        type?: string;
+        k?: number;
     }>;
 }
 
@@ -53,11 +54,7 @@ export function BranchStats({
     activeCustomers,
     wifiSessions,
     growth = { revenue: 0, customers: 2.4, wifi: 2.4 },
-    chartData = {
-        name: "Jan",
-        value: 550,
-        type: ""
-    }
+    chartData = DEFAULT_CHART_DATA
 }: BranchStatsProps) {
     console.log(revenue);
     return (

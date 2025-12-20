@@ -44,7 +44,9 @@ export function Sidebar() {
     useEffect(() => {
         // Get user data from auth service
         const userData = authService.getUser();
-        setUser(userData);
+        if (userData) {
+            setUser(userData);
+        }
     }, []);
 
     const handleLogout = async () => {
