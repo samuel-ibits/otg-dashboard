@@ -4,14 +4,14 @@ import { useState } from "react";
 import { Wifi, Eye } from "lucide-react";
 import { WiFiDrawer } from "@/app/components/WiFiDrawer";
 
-// Mock Data
-const MOCK_WIFI_PLANS = [
-    { id: '1', name: 'Daily - Unlimited', price: '2,000', speed: '50 Mbps', status: 'active' },
-    { id: '2', name: 'Weekly - Unlimited', price: '10,000', speed: '50 Mbps', status: 'active' },
-];
+import type { BranchWifiPlan } from "@/app/lib/types";
 
-export function BranchWiFi() {
-    const [selectedPlan, setSelectedPlan] = useState<any | null>(null);
+interface BranchWiFiProps {
+    plans?: BranchWifiPlan[];
+}
+
+export function BranchWiFi({ plans = [] }: BranchWiFiProps) {
+    const [selectedPlan, setSelectedPlan] = useState<BranchWifiPlan | null>(null);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
     const handleRowClick = (plan: any) => {
@@ -29,7 +29,7 @@ export function BranchWiFi() {
             </div>
 
             <div className="p-6 grid gap-4">
-                {MOCK_WIFI_PLANS.map((plan) => (
+                {plans.map((plan: BranchWifiPlan) => (
                     <div
                         key={plan.id}
                         className="flex items-center justify-between p-4 border rounded-lg hover:border-blue-200 hover:bg-blue-50 cursor-pointer transition-all"

@@ -5,37 +5,16 @@ import { Plus, SlidersHorizontal, Search, Image as ImageIcon } from "lucide-reac
 import { ProductDrawer } from "@/app/components/ProductDrawer";
 import type { Product } from "@/app/lib/types";
 
-// Mock Product Data for display (since we don't have branch.products yet)
-const MOCK_PRODUCTS: Product[] = [
-    {
-        id: "1",
-        name: "King Size Burger",
-        price: 3500,
-        category: "Food",
-        createdAt: "2024-05-11T10:30:00Z",
-        status: "active",
-        branchAmenityId: "1",
-        description: "Delicious king size burger",
-        meta: {},
-        stock: 50
-    },
-    {
-        id: "2",
-        name: "Conference Hall",
-        price: 50000,
-        category: "Space",
-        createdAt: "2024-05-10T09:15:00Z",
-        status: "active",
-        branchAmenityId: "2",
-        description: "Large conference hall for events",
-        meta: {},
-        stock: 1
-    }
-];
+interface BranchProductsProps {
+    products?: Product[];
+}
 
-export function BranchProducts() {
+export function BranchProducts({ products = [] }: BranchProductsProps) {
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+    // Use passed products or fallback to empty array
+    const displayProducts = products;
 
     const handleRowClick = (product: Product) => {
         setSelectedProduct(product);
@@ -73,7 +52,7 @@ export function BranchProducts() {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {MOCK_PRODUCTS.map((product) => (
+                        {displayProducts.map((product) => (
                             <tr
                                 key={product.id}
                                 className="hover:bg-gray-50 cursor-pointer transition-colors"
@@ -88,7 +67,7 @@ export function BranchProducts() {
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 font-medium text-gray-900">₦{Number(product.price).toLocaleString()}</td>
-                                <td className="px-6 py-4">{product.category}</td>
+                                <td className="px-6 py-4">{product.branch_amenity?.amenityName}</td>
                                 <td className="px-6 py-4">
                                     <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
                                         {product.status}

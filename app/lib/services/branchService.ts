@@ -7,100 +7,171 @@
 
 import { api, buildQueryString, APIResponse, getAuthHeader } from '../api';
 import type {
-    Branch,
-    CreateBranchDTO,
-    UpdateBranchDTO,
-    BranchQueryParams,
-    PaginatedResponse,
+  Branch,
+  CreateBranchDTO,
+  UpdateBranchDTO,
+  BranchQueryParams,
+  PaginatedResponse,
+  BranchActivityLog,
+  BranchMedia,
+  BranchReview,
+  BranchReviewsData,
+  BranchWifiPlan,
+  Product,
 } from '../types';
 
 const BRANCH_ENDPOINTS = {
-    base: '/branches',
-    create: '/branches/create',
-    byId: (id: string) => `/branches/${id}`,
+  base: '/branches',
+  create: '/branches/create',
+  byId: (id: string) => `/branches/${id}`,
+  orders: (id: string) => `/branches/${id}/orders`,
+  wifi: (id: string) => `/branches/${id}/wifi-infrastructure`,
+  products: '/products',
+  activityLogs: '/branches/activity-logs',
+  media: '/branches/media',
+  reviews: '/branches/reviews',
 };
 
 export const branchService = {
-    /**
-     * Get all branches with optional search and filtering
-     * 
-     * @param params - Query parameters (search, cursor, limit)
-     * @returns Promise with paginated branches
-     */
-    async getAll(
-        params?: BranchQueryParams
-    ): Promise<APIResponse<PaginatedResponse<Branch>>> {
-        const queryString = params ? buildQueryString(params) : '';
-        return api.get(`${BRANCH_ENDPOINTS.base}${queryString}`, {
-            headers: getAuthHeader(),
-        });
-    },
+  /**
+   * Get all branches with optional search and filtering
+   * 
+   * @param params - Query parameters (search, cursor, limit)
+   * @returns Promise with paginated branches
+   */
+  async getAll(
+    params?: BranchQueryParams
+  ): Promise<APIResponse<PaginatedResponse<Branch>>> {
+    const queryString = params ? buildQueryString(params) : '';
+    return api.get(`${BRANCH_ENDPOINTS.base}${queryString}`, {
+      headers: getAuthHeader(),
+    });
+  },
 
-    /**
-     * Get a single branch by ID
-     * 
-     * @param id - Branch ID
-     * @returns Promise with branch data
-     */
-    async getById(id: string): Promise<APIResponse<Branch>> {
-        return api.get(BRANCH_ENDPOINTS.byId(id), {
-            headers: getAuthHeader(),
-        });
-    },
+  /**
+   * Get a single branch by ID
+   * 
+   * @param id - Branch ID
+   * @returns Promise with branch data
+   */
+  async getById(id: string): Promise<APIResponse<Branch>> {
+    return api.get(BRANCH_ENDPOINTS.byId(id), {
+      headers: getAuthHeader(),
+    });
+  },
 
-    /**
-     * Create a new branch
-     * 
-     * @param data - Branch creation data
-     * @returns Promise with created branch
-     */
-    async create(data: CreateBranchDTO): Promise<APIResponse<Branch>> {
-        return api.post(BRANCH_ENDPOINTS.create, data, {
-            headers: getAuthHeader(),
-        });
-    },
+  /**
+   * Create a new branch
+   * 
+   * @param data - Branch creation data
+   * @returns Promise with created branch
+   */
+  async create(data: CreateBranchDTO): Promise<APIResponse<Branch>> {
+    return api.post(BRANCH_ENDPOINTS.create, data, {
+      headers: getAuthHeader(),
+    });
+  },
 
-    /**
-     * Update an existing branch
-     * 
-     * @param id - Branch ID
-     * @param data - Branch update data
-     * @returns Promise with updated branch
-     */
-    async update(
-        id: string,
-        data: UpdateBranchDTO
-    ): Promise<APIResponse<Branch>> {
-        return api.put(BRANCH_ENDPOINTS.byId(id), data, {
-            headers: getAuthHeader(),
-        });
-    },
+  /**
+   * Update an existing branch
+   * 
+   * @param id - Branch ID
+   * @param data - Branch update data
+   * @returns Promise with updated branch
+   */
+  async update(
+    id: string,
+    data: UpdateBranchDTO
+  ): Promise<APIResponse<Branch>> {
+    return api.put(BRANCH_ENDPOINTS.byId(id), data, {
+      headers: getAuthHeader(),
+    });
+  },
 
-    /**
-     * Delete a branch
-     * 
-     * @param id - Branch ID
-     * @returns Promise with deletion confirmation
-     */
-    async delete(id: string): Promise<APIResponse<void>> {
-        return api.delete(BRANCH_ENDPOINTS.byId(id), {
-            headers: getAuthHeader(),
-        });
-    },
+  /**
+   * Delete a branch
+   * 
+   * @param id - Branch ID
+   * @returns Promise with deletion confirmation
+   */
+  async delete(id: string): Promise<APIResponse<void>> {
+    return api.delete(BRANCH_ENDPOINTS.byId(id), {
+      headers: getAuthHeader(),
+    });
+  },
 
-    /**
-     * Search branches
-     * 
-     * @param searchTerm - Search term
-     * @param limit - Number of results
-     * @returns Promise with search results
-     */
-    async search(
-        searchTerm: string,
-        limit: number = 10
-    ): Promise<APIResponse<PaginatedResponse<Branch>>> {
-        return this.getAll({ search: searchTerm, limit });
-    },
+  /**
+   * Search branches
+   * 
+   * @param searchTerm - Search term
+   * @param limit - Number of results
+   * @returns Promise with search results
+   */
+  async search(
+    searchTerm: string,
+    limit: number = 10
+  ): Promise<APIResponse<PaginatedResponse<Branch>>> {
+    return this.getAll({ search: searchTerm, limit });
+  },
+
+  /**
+   * Get branch orders
+   */
+  async getOrders(
+    branchId: string,
+    params?: any
+  ): Promise<APIResponse<any>> { // Using any for now to match strict UI needs or complex backend response
+    const queryString = params ? buildQueryString(params) : '';
+    return api.get(`${BRANCH_ENDPOINTS.orders(branchId)}${queryString}?branchId=${branchId}`, {
+      headers: getAuthHeader(),
+    });
+  },
+
+  /**
+   * Get branch Wi-Fi infrastructure
+   */
+  async getWifiInfrastructure(branchId: string): Promise<APIResponse<BranchWifiPlan[]>> {
+    return api.get(`${BRANCH_ENDPOINTS.wifi(branchId)}?branchId=${branchId}`, {
+      headers: getAuthHeader(),
+    });
+  },
+
+  /**
+   * Get products (filtered for branch context if needed, though endpoint is generic /products)
+   */
+  async getProducts(params?: any): Promise<APIResponse<PaginatedResponse<Product>>> {
+    const queryString = params ? buildQueryString(params) : '';
+    return api.get(`${BRANCH_ENDPOINTS.products}${queryString}`, {
+      headers: getAuthHeader(),
+    });
+  },
+
+  /**
+   * Get branch activity logs
+   */
+  async getActivityLogs(branchId: string): Promise<APIResponse<BranchActivityLog[]>> {
+    return api.get(`${BRANCH_ENDPOINTS.activityLogs}?branchId=${branchId}`, {
+      headers: getAuthHeader(),
+    });
+  },
+
+  /**
+   * Get branch media
+   */
+  async getMedia(branchId: string): Promise<APIResponse<BranchMedia[]>> {
+    return api.get(`${BRANCH_ENDPOINTS.media}?branchId=${branchId}`, {
+      headers: getAuthHeader(),
+    });
+  },
+
+  /**
+   * Get branch reviews
+   */
+  async getReviews(branchId: string): Promise<APIResponse<BranchReviewsData>> {
+    return api.get(`${BRANCH_ENDPOINTS.reviews}?branchId=${branchId}`, {
+      headers: getAuthHeader(),
+    });
+  },
 };
 
 /**

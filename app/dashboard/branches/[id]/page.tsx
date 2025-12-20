@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/app/lib/utils";
 import { BranchActionModal } from "@/app/components/BranchActionModals";
 import { branchService } from "@/app/lib/services/branchService";
-import type { Branch } from "@/app/lib/types";
+import type { Branch, BranchActivityLog, BranchMedia, BranchReview, BranchReviewStats, BranchWifiPlan, Product, RatingDistribution } from "@/app/lib/types";
 import { OrdersTable } from "@/app/components/OrdersTable";
 import { BranchProducts } from "@/app/components/BranchProducts";
 import { BranchWiFi } from "@/app/components/BranchWiFi";
@@ -30,6 +30,18 @@ export default function BranchDetailsPage({ params }: BranchDetailsPageProps) {
     const [activeTab, setActiveTab] = useState("Admin & Staff");
     const [modalType, setModalType] = useState<"deactivate" | "delete" | null>(null);
 
+    // Sub-tab Data States
+    const [orders, setOrders] = useState<any[]>([]);
+    const [wifiPlans, setWifiPlans] = useState<BranchWifiPlan[]>([]);
+    const [products, setProducts] = useState<Product[]>([]);
+    const [staff, setStaff] = useState<any[]>([]);
+    const [activityLogs, setActivityLogs] = useState<BranchActivityLog[]>([]);
+    const [media, setMedia] = useState<BranchMedia[]>([]);
+    const [reviews, setReviews] = useState<BranchReview[]>([]);
+    const [reviewStats, setReviewStats] = useState<BranchReviewStats | undefined>(undefined);
+    const [ratingDistribution, setRatingDistribution] = useState<RatingDistribution | undefined>(undefined);
+    const [subTabLoading, setSubTabLoading] = useState(false);
+
     const tabs = ["Orders", "Wi-Fi Infrastructure", "Products & Amenities", "Admin & Staff", "Activity log", "Pictures", "Reviews"];
 
     // Fetch branch details
@@ -41,7 +53,7 @@ export default function BranchDetailsPage({ params }: BranchDetailsPageProps) {
                 const response = await branchService.getById(id);
 
                 if (response.success && response.data) {
-                    setBranch(response.data);
+                    setBranch(response.data.branchInfo);
                 } else {
                     setError(response.error || "Failed to load branch");
                 }
@@ -56,6 +68,50 @@ export default function BranchDetailsPage({ params }: BranchDetailsPageProps) {
             fetchBranch();
         }
     }, [id]);
+
+    // Fetch Sub-tab Data
+    useEffect(() => {
+        if (!id) return;
+
+        const fetchData = async () => {
+            setSubTabLoading(true);
+            try {
+                if (activeTab === "Orders") {
+                    const res = await branchService.getOrders(id);
+                    if (res.success && res.data) setOrders(res.data?.orders);
+                } else if (activeTab === "Wi-Fi Infrastructure") {
+                    const res = await branchService.getWifiInfrastructure(id);
+                    if (res.success && res.data) setWifiPlans(res.data?.wifiPlans);
+                } else if (activeTab === "Products & Amenities") {
+                    const res = await branchService.getProducts(); // Generic product fetch
+                    if (res.success && res.data) setProducts(res.data?.products);
+                } else if (activeTab === "Activity log") {
+                    const res = await branchService.getActivityLogs(id);
+                    if (res.success && res.data) setActivityLogs(res.data?.logs);
+                } else if (activeTab === "Pictures") {
+                    const res = await branchService.getMedia(id);
+                    if (res.success && res.data) setMedia(res.data?.media);
+                } else if (activeTab === "Reviews") {
+                    const res = await branchService.getReviews(id);
+                    if (res.success && res.data) {
+                        setReviews(res.data.reviews);
+                        setReviewStats(res.data.branchStats);
+                        setRatingDistribution(res.data.ratingDistribution);
+                    }
+                }
+                else if (activeTab === "Admin & Staff") {
+                    const res = await branchService.getStaff(id);
+                    if (res.success && res.data) setStaff(res.data?.staff);
+                }
+            } catch (error) {
+                console.error("Error fetching tab data:", error);
+            } finally {
+                setSubTabLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [id, activeTab]);
 
     const handleDelete = async () => {
         if (!branch) return;
@@ -84,9 +140,10 @@ export default function BranchDetailsPage({ params }: BranchDetailsPageProps) {
             if (response.success) {
                 setModalType(null);
                 // Refresh branch data
+                // Refresh branch data
                 const refreshResponse = await branchService.getById(id);
                 if (refreshResponse.success && refreshResponse.data) {
-                    setBranch(refreshResponse.data);
+                    setBranch(refreshResponse.data.branchInfo);
                 }
             } else {
                 alert(response.error || "Failed to deactivate branch");
@@ -203,13 +260,15 @@ export default function BranchDetailsPage({ params }: BranchDetailsPageProps) {
                             </div>
                             <p className="pl-6 text-sm font-medium text-gray-900">{branch.fullAddress}</p>
                         </div>
-                        <div>
-                            <div className="flex items-start gap-2 text-sm text-gray-500 mb-1">
-                                <MapPin className="h-4 w-4 mt-0.5" />
-                                <span>Street Address</span>
+                        {branch.streetAddress && (
+                            <div>
+                                <div className="flex items-start gap-2 text-sm text-gray-500 mb-1">
+                                    <MapPin className="h-4 w-4 mt-0.5" />
+                                    <span>Street Address</span>
+                                </div>
+                                <p className="pl-6 text-sm font-medium text-gray-900">{branch.streetAddress}</p>
                             </div>
-                            <p className="pl-6 text-sm font-medium text-gray-900">{branch.streetAddress}</p>
-                        </div>
+                        )}
                         <div>
                             <div className="flex items-start gap-2 text-sm text-gray-500 mb-1">
                                 <MapPin className="h-4 w-4 mt-0.5" />
@@ -217,13 +276,15 @@ export default function BranchDetailsPage({ params }: BranchDetailsPageProps) {
                             </div>
                             <p className="pl-6 text-sm font-medium text-gray-900">{branch.city}, {branch.state}</p>
                         </div>
-                        <div>
-                            <div className="flex items-start gap-2 text-sm text-gray-500 mb-1">
-                                <MapPin className="h-4 w-4 mt-0.5" />
-                                <span>Country</span>
+                        {branch.country && (
+                            <div>
+                                <div className="flex items-start gap-2 text-sm text-gray-500 mb-1">
+                                    <MapPin className="h-4 w-4 mt-0.5" />
+                                    <span>Country</span>
+                                </div>
+                                <p className="pl-6 text-sm font-medium text-gray-900">{branch.country}</p>
                             </div>
-                            <p className="pl-6 text-sm font-medium text-gray-900">{branch.country}</p>
-                        </div>
+                        )}
                         <div>
                             <div className="flex items-start gap-2 text-sm text-gray-500 mb-1">
                                 <Calendar className="h-4 w-4 mt-0.5" />
@@ -244,20 +305,22 @@ export default function BranchDetailsPage({ params }: BranchDetailsPageProps) {
                     )}
 
                     {/* Working Hours */}
-                    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                            <Clock className="h-5 w-5" />
-                            Working Hours
-                        </h3>
-                        <div className="grid grid-cols-2 gap-3">
-                            {(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const).map((day) => (
-                                <div key={day} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
-                                    <span className="text-sm font-medium text-gray-700 capitalize">{day}</span>
-                                    <span className="text-sm text-gray-600">{getDayWorkingHours(day)}</span>
-                                </div>
-                            ))}
+                    {branch.working_hours && (
+                        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                            <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                <Clock className="h-5 w-5" />
+                                Working Hours
+                            </h3>
+                            <div className="grid grid-cols-2 gap-3">
+                                {(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const).map((day) => (
+                                    <div key={day} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
+                                        <span className="text-sm font-medium text-gray-700 capitalize">{day}</span>
+                                        <span className="text-sm text-gray-600">{getDayWorkingHours(day)}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
 
@@ -285,14 +348,16 @@ export default function BranchDetailsPage({ params }: BranchDetailsPageProps) {
                         <div>
                             <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                                 <Users className="h-5 w-5" />
-                                Staff Members ({branch.staff?.length || 0})
+                                Staff Members ({staff.length || 0})
                             </h3>
-                            {branch.staff && branch.staff.length > 0 ? (
+                            {subTabLoading ? (
+                                <p className="text-center py-8 text-gray-500">Loading staff...</p>
+                            ) : staff && staff.length > 0 ? (
                                 <div className="space-y-3">
-                                    {branch.staff.map((member, index) => (
+                                    {staff.map((member, index) => (
                                         <div key={index} className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-gray-50">
                                             <div>
-                                                <p className="font-medium text-gray-900">{member.fullName}</p>
+                                                <p className="font-medium text-gray-900">{member.fullName || member.name}</p>
                                                 <p className="text-sm text-gray-500">{member.email}</p>
                                             </div>
                                             <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full capitalize">
@@ -312,28 +377,27 @@ export default function BranchDetailsPage({ params }: BranchDetailsPageProps) {
                     )}
                     {activeTab === "Orders" && (
                         <div className="min-h-[300px]">
-                            {/* Assuming OrdersTable handles mock data if branch.orders is undefined for now */}
-                            <OrdersTable orders={[]} />
+                            {subTabLoading ? <p className="text-center py-8 text-gray-500">Loading orders...</p> : <OrdersTable orders={orders} />}
                         </div>
                     )}
                     {activeTab === "Wi-Fi Infrastructure" && (
                         <div className="min-h-[300px]">
-                            <BranchWiFi />
+                            {subTabLoading ? <p className="text-center py-8 text-gray-500">Loading infrastructure...</p> : <BranchWiFi plans={wifiPlans} />}
                         </div>
                     )}
                     {activeTab === "Products & Amenities" && (
                         <div className="min-h-[300px]">
-                            <BranchProducts />
+                            {subTabLoading ? <p className="text-center py-8 text-gray-500">Loading products...</p> : <BranchProducts products={products} />}
                         </div>
                     )}
                     {activeTab === "Activity log" && (
-                        <ActivityLog />
+                        subTabLoading ? <p className="text-center py-8 text-gray-500">Loading logs...</p> : <ActivityLog logs={activityLogs} />
                     )}
                     {activeTab === "Pictures" && (
-                        <BranchGallery />
+                        subTabLoading ? <p className="text-center py-8 text-gray-500">Loading images...</p> : <BranchGallery images={media} />
                     )}
                     {activeTab === "Reviews" && (
-                        <BranchReviews />
+                        subTabLoading ? <p className="text-center py-8 text-gray-500">Loading reviews...</p> : <BranchReviews reviews={reviews} stats={reviewStats} distribution={ratingDistribution} />
                     )}
                 </div>
             </div>

@@ -1,19 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Edit2, Trash2, Plus, X } from "lucide-react";
+import { Edit2, Trash2, Plus, X, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/app/lib/utils";
 
-// Mock Data
-const MOCK_IMAGES = [
-    { id: '1', url: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=1000&auto=format&fit=crop', name: 'cozy_cafe_1.png' },
-    { id: '2', url: 'https://images.unsplash.com/photo-1521017432531-fbd92d768814?q=80&w=1000&auto=format&fit=crop', name: 'interior_wide.png' },
-    { id: '3', url: 'https://images.unsplash.com/photo-1507133750069-41d571dd5a8f?q=80&w=1000&auto=format&fit=crop', name: 'seating_area.png' },
-];
+import type { BranchMedia } from "@/app/lib/types";
 
-export function BranchGallery() {
+interface BranchGalleryProps {
+    images?: BranchMedia[];
+}
+
+export function BranchGallery({ images = [] }: BranchGalleryProps) {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [images, setImages] = useState(MOCK_IMAGES);
+    // const [localImages, setLocalImages] = useState(images); // If we wanted local state for editing
 
     return (
         <div className="space-y-6">
@@ -29,17 +28,38 @@ export function BranchGallery() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Main large image */}
-                <div className="aspect-video relative rounded-lg overflow-hidden">
-                    <img src={images[0]?.url} alt="Branch Main" className="object-cover w-full h-full" />
-                </div>
-                <div className="grid grid-rows-2 gap-4">
-                    {images.slice(1, 3).map((img) => (
-                        <div key={img.id} className="aspect-video relative rounded-lg overflow-hidden">
-                            <img src={img.url} alt={img.name} className="object-cover w-full h-full" />
+                {images.length === 0 ? (
+                    <div className="col-span-full aspect-video md:aspect-[2/1] relative rounded-lg overflow-hidden bg-gray-50 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-6 text-center">
+                        <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+                            <ImageIcon className="h-6 w-6 text-gray-400" />
                         </div>
-                    ))}
-                </div>
+                        <h4 className="text-sm font-medium text-gray-900">No images added</h4>
+                        <p className="text-sm text-gray-500 mt-1 mb-4">Add photos of your branch to showcase it to customers.</p>
+                        <button
+                            onClick={() => setIsEditModalOpen(true)}
+                            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors"
+                        >
+                            <Plus className="h-4 w-4" />
+                            Add pictures
+                        </button>
+                    </div>
+                ) : (
+                    <>
+                        {/* Main large image */}
+                        <div className="aspect-video relative rounded-lg overflow-hidden bg-gray-100">
+                            {images[0] && (
+                                <img src={images[0].url} alt="Branch Main" className="object-cover w-full h-full" />
+                            )}
+                        </div>
+                        <div className="grid grid-rows-2 gap-4">
+                            {images.slice(1, 3).map((img) => (
+                                <div key={img.id} className="aspect-video relative rounded-lg overflow-hidden bg-gray-100">
+                                    <img src={img.url} alt={img.name} className="object-cover w-full h-full" />
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                )}
             </div>
 
             {/* Edit Modal */}

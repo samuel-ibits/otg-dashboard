@@ -15,8 +15,10 @@ interface Order {
         handle: string;
         avatar: string;
     };
-    amount: string;
-    date: string;
+    amount?: string;
+    price?: string | number;
+    date?: string;
+    createdAt?: string;
 }
 
 interface OrdersTableProps {
@@ -88,8 +90,8 @@ export function OrdersTable({ orders }: OrdersTableProps) {
                                         </div>
                                     </div>
                                 </td>
-                                <td className="px-6 py-4 font-medium text-gray-900">{order.amount}</td>
-                                <td className="px-6 py-4">{order.date}</td>
+                                <td className="px-6 py-4 font-medium text-gray-900">{order.price}</td>
+                                <td className="px-6 py-4">{order.createdAt}</td>
                                 <td className="px-6 py-4 text-right">
                                     <ActionMenu
                                         onEdit={() => console.log("Edit order", order.id)}
