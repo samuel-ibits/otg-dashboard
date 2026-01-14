@@ -25,16 +25,17 @@ export interface LoginResponse {
     message?: string;
     data?: {
         token?: string;
-        user?: AuthUser;
+        // user?: AuthUser;
+        admin?: AuthUser;
         accessToken?: string;
         refreshToken?: string;
     };
     token?: string; // Support both nested and flat token structure
-    user?: AuthUser;
+    admin?: AuthUser;
 }
 
 const AUTH_ENDPOINTS = {
-    login: '/auth/login',
+    login: '/login',
     logout: '/auth/logout',
     me: '/auth/me',
     refresh: '/auth/refresh',
@@ -60,7 +61,7 @@ export const authService = {
 
             // Handle different response structures
             const token = response.data?.token || response.token;
-            const user = response.data?.user || response.user;
+            const user = response.data?.admin || response.admin;
             const accessToken = response.data?.accessToken;
             const refreshToken = response.data?.refreshToken;
 

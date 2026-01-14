@@ -1,13 +1,13 @@
 /**
  * API Utility Functions for OTG Dashboard
- * 
+ *
  * This module provides centralized API configuration and helper functions
  * for making HTTP requests throughout the application.
  */
 
 // API Configuration
 const API_CONFIG = {
-    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:5006/api/v1/',
+    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:5006/api/v1/admin',
     timeout: 30000, // 30 seconds
     headers: {
         'Content-Type': 'application/json',
@@ -41,9 +41,13 @@ async function fetchWithConfig<T>(
     endpoint: string,
     options: RequestInit = {}
 ): Promise<T> {
-    const url = endpoint.startsWith('http')
-        ? endpoint
-        : `${API_CONFIG.baseURL}${endpoint}`;
+    let url = endpoint;
+    if (!endpoint.startsWith('http')) {
+        // Ensure proper slash handling between baseURL and endpoint
+        const baseUrl = API_CONFIG.baseURL.replace(/\/$/, '');
+        const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+        url = `${baseUrl}${path}`;
+    }
 
     const config: RequestInit = {
         ...options,
