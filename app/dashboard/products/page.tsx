@@ -8,8 +8,10 @@ import { DeleteProductModal } from "@/app/components/DeleteProductModal";
 import { ActionMenu } from "@/app/components/ActionMenu";
 import { productService } from "@/app/lib/services/productService";
 import type { Product } from "@/app/lib/types";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 export default function ProductsPage() {
+    const { user } = useAuth();
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -23,10 +25,10 @@ export default function ProductsPage() {
         try {
             const response = await productService.getAll();
             if (response.success && response.data) {
-                // Determine if response.data is PaginatedResponse or array
-                // The API helper might return it differently depending on service implementation
-                // Assuming it returns PaginatedResponse based on types, but let's check structure safe
-                if (Array.isArray(response.data)) {
+                // API returns products under data.products
+                if ('products' in response.data && Array.isArray(response.data.products)) {
+                    setProducts(response.data.products);
+                } else if (Array.isArray(response.data)) {
                     setProducts(response.data);
                 } else if ('data' in response.data && Array.isArray((response.data as any).data)) {
                     setProducts((response.data as any).data);
@@ -157,7 +159,7 @@ export default function ProductsPage() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 font-medium text-gray-900">₦{Number(product.price).toLocaleString()}</td>
-                                        <td className="px-6 py-4">{product.category || '-'}</td>
+                                        <td className="px-6 py-4">{product.branch_amenity?.amenityName || product.category || '-'}</td>
                                         <td className="px-6 py-4">{product.createdAt ? new Date(product.createdAt).toLocaleDateString() : '-'}</td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-1.5 text-green-600">
@@ -204,6 +206,7 @@ export default function ProductsPage() {
                     setIsAddModalOpen(false);
                     fetchProducts();
                 }}
+                branchId={user?.branchId}
             />
 
             <ProductDrawer
@@ -211,6 +214,7 @@ export default function ProductsPage() {
                 onClose={() => setSelectedProduct(null)}
                 product={selectedProduct}
                 onDelete={handleDeleteRequest}
+                onSuccess={fetchProducts}
             />
 
             <DeleteProductModal

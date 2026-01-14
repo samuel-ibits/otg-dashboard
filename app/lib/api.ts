@@ -7,7 +7,8 @@
 
 // API Configuration
 const API_CONFIG = {
-    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:5006/api/v1/admin',
+    adminBaseURL: process.env.NEXT_PUBLIC_API_BASE_URL + '/admin' || 'http://127.0.0.1:5006/api/v1/admin',
+    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:5006/api/v1',
     timeout: 30000, // 30 seconds
     headers: {
         'Content-Type': 'application/json',
@@ -34,27 +35,35 @@ export interface APIResponse<T = any> {
     message?: string;
 }
 
+// Extended request options
+export interface APIRequestOptions extends RequestInit {
+    useAdmin?: boolean; // If true, use adminBaseURL; if false, use baseURL
+}
+
 /**
  * Generic fetch wrapper with error handling
  */
 async function fetchWithConfig<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: APIRequestOptions = {}
 ): Promise<T> {
+    const { useAdmin = true, ...fetchOptions } = options;
+
     let url = endpoint;
     if (!endpoint.startsWith('http')) {
-        // Ensure proper slash handling between baseURL and endpoint
-        const baseUrl = API_CONFIG.baseURL.replace(/\/$/, '');
+        // Use adminBaseURL by default, or baseURL if useAdmin is false
+        const baseUrl = useAdmin ? API_CONFIG.adminBaseURL : API_CONFIG.baseURL;
+        const cleanBaseUrl = baseUrl.replace(/\/$/, '');
         const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-        url = `${baseUrl}${path}`;
+        url = `${cleanBaseUrl}${path}`;
     }
 
     const config: RequestInit = {
-        ...options,
+        ...fetchOptions,
         headers: {
             ...API_CONFIG.headers,
             ...getAuthHeader(), // Automatically attach auth header
-            ...options.headers,
+            ...fetchOptions.headers,
         },
     };
 
@@ -102,7 +111,7 @@ export const api = {
     /**
      * GET request
      */
-    get: <T = any>(endpoint: string, options?: RequestInit): Promise<T> => {
+    get: <T = any>(endpoint: string, options?: APIRequestOptions): Promise<T> => {
         return fetchWithConfig<T>(endpoint, {
             ...options,
             method: 'GET',
@@ -115,7 +124,7 @@ export const api = {
     post: <T = any>(
         endpoint: string,
         data?: any,
-        options?: RequestInit
+        options?: APIRequestOptions
     ): Promise<T> => {
         return fetchWithConfig<T>(endpoint, {
             ...options,
@@ -130,7 +139,7 @@ export const api = {
     put: <T = any>(
         endpoint: string,
         data?: any,
-        options?: RequestInit
+        options?: APIRequestOptions
     ): Promise<T> => {
         return fetchWithConfig<T>(endpoint, {
             ...options,
@@ -145,7 +154,7 @@ export const api = {
     patch: <T = any>(
         endpoint: string,
         data?: any,
-        options?: RequestInit
+        options?: APIRequestOptions
     ): Promise<T> => {
         return fetchWithConfig<T>(endpoint, {
             ...options,
@@ -157,7 +166,7 @@ export const api = {
     /**
      * DELETE request
      */
-    delete: <T = any>(endpoint: string, options?: RequestInit): Promise<T> => {
+    delete: <T = any>(endpoint: string, options?: APIRequestOptions): Promise<T> => {
         return fetchWithConfig<T>(endpoint, {
             ...options,
             method: 'DELETE',
@@ -200,7 +209,7 @@ export async function uploadFile(
 
     const url = endpoint.startsWith('http')
         ? endpoint
-        : `${API_CONFIG.baseURL}${endpoint}`;
+        : `${API_CONFIG.adminBaseURL}${endpoint}`;
 
     const response = await fetch(url, {
         method: 'POST',

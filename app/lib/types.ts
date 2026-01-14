@@ -11,6 +11,11 @@ export interface PaginationParams {
     limit?: number;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
+    branchId?: string | number;
+    search?: string;
+    categoryId?: string | number;
+    minPrice?: number;
+    maxPrice?: number;
 }
 
 export interface PaginatedResponse<T> {
@@ -99,7 +104,7 @@ export interface Product {
     price: string | number;
     businessId: string | number;
     branchId: string | number;
-    // branchAmenityId: string;
+    branchAmenityId: string;
     status: 'available' | 'active' | 'inactive'; // API returns 'available', keeping others for safety
     meta: Record<string, any>; // Flexible meta field
     category?: string; // Optional as not in recent sample response but might be useful
@@ -112,20 +117,9 @@ export interface Product {
     media?: any[]; // Array for media if present
     branch_amenity?: {
         id: string;
-        businessId: number;
-        branchId: number;
+        amenityName: string;
         amenityId: string;
         status: string;
-        rating: number | null;
-        totalRating: number;
-        ratingCount: number;
-        meta: any;
-        createdAt: string;
-        updatedAt: string;
-        amenity: {
-            id: string;
-            name: string; // e.g., "food"
-        };
     };
 }
 
@@ -134,7 +128,7 @@ export interface CreateProductDTO {
     branchAmenityId?: string;
     description: string;
     price: string | number;
-    // meta?: Record<string, any>;
+    meta?: Record<string, any>;
     // fields not in the example but potentially useful to keep optional
     category?: string;
     // stock?: number;

@@ -13,9 +13,10 @@ interface AddProductModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSuccess?: () => void;
+    branchId?: string | number;
 }
 
-export function AddProductModal({ isOpen, onClose, onSuccess }: AddProductModalProps) {
+export function AddProductModal({ isOpen, onClose, onSuccess, branchId }: AddProductModalProps) {
     const [loading, setLoading] = useState(false);
     const [amenities, setAmenities] = useState<Amenity[]>([]);
     const [loadingAmenities, setLoadingAmenities] = useState(false);
@@ -40,9 +41,21 @@ export function AddProductModal({ isOpen, onClose, onSuccess }: AddProductModalP
         const fetchAmenities = async () => {
             setLoadingAmenities(true);
             try {
-                const response = await amenityService.getGlobal();
-                if (response.success && response.data) {
-                    setAmenities(response.data);
+                if (branchId) {
+                    const response = await amenityService.getByBranch(branchId);
+                    if (response.success && response.data) {
+                        // Map BranchAmenity to Amenity format for dropdown
+                        const mappedAmenities = response.data.map((ba: any) => ({
+                            id: ba.id, // Use branch amenity ID
+                            name: ba.amenityName,
+                        }));
+                        setAmenities(mappedAmenities);
+                    }
+                } else {
+                    const response = await amenityService.getGlobal();
+                    if (response.success && response.data) {
+                        setAmenities(response.data);
+                    }
                 }
             } catch (err) {
                 console.error('Failed to fetch amenities:', err);
@@ -54,7 +67,7 @@ export function AddProductModal({ isOpen, onClose, onSuccess }: AddProductModalP
         if (isOpen) {
             fetchAmenities();
         }
-    }, [isOpen]);
+    }, [isOpen, branchId]);
 
     const handleAddMeta = () => {
         if (metaKey && metaValue) {
@@ -85,7 +98,6 @@ export function AddProductModal({ isOpen, onClose, onSuccess }: AddProductModalP
                 price: Number(formData.price), // Ensure number
                 meta: formData.meta,
                 category: formData.category, // Optional in type but we use it
-                stock: Number(formData.stock), // Optional in type
             };
 
             const response = await productService.create(payload);

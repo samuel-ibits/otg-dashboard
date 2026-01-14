@@ -61,8 +61,6 @@ export const productService = {
         branchId: string | number,
         params?: PaginationParams
     ): Promise<APIResponse<PaginatedResponse<Product>>> {
-        const queryString = params ? buildQueryString(params) : '';
-        const separator = queryString ? '&' : '?';
-        return api.get(`${PRODUCT_ENDPOINTS.base}/branch/filter?branchId=${branchId}${queryString ? separator + queryString.slice(1) : ''}`);
+        return this.getAll({ ...params, branchId });
     },
 };
