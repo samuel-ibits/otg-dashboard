@@ -147,8 +147,8 @@ export default function ProductsPage() {
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
                                                 <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
-                                                    {product.imageUrl ? (
-                                                        <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
+                                                    {product.media && product.media.length > 0 ? (
+                                                        <img src={product.media[0]} alt={product.name} className="h-full w-full object-cover" />
                                                     ) : (
                                                         <ImageIcon className="h-5 w-5 text-gray-400" />
                                                     )}

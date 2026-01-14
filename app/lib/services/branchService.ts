@@ -24,16 +24,16 @@ import type {
 } from '../types';
 
 const BRANCH_ENDPOINTS = {
-  base: '/branches',
-  create: '/branches/create',
-  byId: (id: string) => `/branches/${id}`,
-  orders: (id: string) => `/branches/${id}/orders`,
-  wifi: (id: string) => `/branches/${id}/wifi-infrastructure`,
-  products: '/products',
-  activityLogs: '/branches/activity-logs',
-  media: '/branches/media',
-  reviews: '/branches/reviews',
-  staffs: '/branches/staff',
+  base: 'branches',
+  create: 'branches/create',
+  byId: (id: string) => `branches/${id}`,
+  orders: (id: string) => `branches/${id}/orders`,
+  wifi: (id: string) => `branches/${id}/wifi-infrastructure`,
+  products: 'products',
+  activityLogs: 'branches/activity-logs',
+  media: 'branches/media',
+  reviews: 'branches/reviews',
+  staff: (id: string) => `branches/${id}/staff`,
 };
 
 export const branchService = {
@@ -126,7 +126,7 @@ export const branchService = {
     params?: any
   ): Promise<APIResponse<any>> { // Using any for now to match strict UI needs or complex backend response
     const queryString = params ? buildQueryString(params) : '';
-    return api.get(`${BRANCH_ENDPOINTS.orders(branchId)}${queryString}?branchId=${branchId}`, {
+    return api.get(`${BRANCH_ENDPOINTS.orders(branchId)}${queryString}`, {
       headers: getAuthHeader(),
     });
   },
@@ -135,7 +135,7 @@ export const branchService = {
    * Get branch Wi-Fi infrastructure
    */
   async getWifiInfrastructure(branchId: string): Promise<APIResponse<{ wifiPlans: BranchWifiPlan[] }>> {
-    return api.get(`${BRANCH_ENDPOINTS.wifi(branchId)}?branchId=${branchId}`, {
+    return api.get(BRANCH_ENDPOINTS.wifi(branchId), {
       headers: getAuthHeader(),
     });
   },
@@ -179,7 +179,7 @@ export const branchService = {
 
   // get staff
   async getStaff(branchId: string): Promise<APIResponse<{ staff: BranchStaff[] }>> {
-    return api.get(`${BRANCH_ENDPOINTS.staffs}?branchId=${branchId}`, {
+    return api.get(BRANCH_ENDPOINTS.staff(branchId), {
       headers: getAuthHeader(),
     });
   }

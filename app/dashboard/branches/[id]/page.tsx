@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/app/lib/utils";
 import { BranchActionModal } from "@/app/components/BranchActionModals";
 import { branchService } from "@/app/lib/services/branchService";
+import { productService } from "@/app/lib/services/productService";
 import type { Branch, BranchActivityLog, BranchMedia, BranchReview, BranchReviewStats, BranchWifiPlan, Product, RatingDistribution } from "@/app/lib/types";
 import { OrdersTable } from "@/app/components/OrdersTable";
 import { BranchProducts } from "@/app/components/BranchProducts";
@@ -88,8 +89,8 @@ export default function BranchDetailsPage({ params }: BranchDetailsPageProps) {
                     const res = await branchService.getWifiInfrastructure(id);
                     if (res.success && res.data) setWifiPlans(res.data?.wifiPlans);
                 } else if (activeTab === "Products & Amenities") {
-                    const res = await branchService.getProducts(); // Generic product fetch
-                    if (res.success && res.data) setProducts(res.data?.products);
+                    const res = await branchService.getProducts(id);
+                    if (res.success && res.data) setProducts(res.data?.products || res.data?.data || []);
                 } else if (activeTab === "Activity log") {
                     const res = await branchService.getActivityLogs(id);
                     if (res.success && res.data) setActivityLogs(res.data?.logs);

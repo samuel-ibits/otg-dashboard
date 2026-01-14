@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Upload, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/app/lib/utils";
 
 import { productService } from "@/app/lib/services/productService";
-import type { CreateProductDTO } from "@/app/lib/types";
+import { amenityService } from "@/app/lib/services/amenityService";
+import type { CreateProductDTO, Amenity } from "@/app/lib/types";
+import { branchService } from "../lib/services/branchService";
 
 interface AddProductModalProps {
     isOpen: boolean;
@@ -15,6 +17,8 @@ interface AddProductModalProps {
 
 export function AddProductModal({ isOpen, onClose, onSuccess }: AddProductModalProps) {
     const [loading, setLoading] = useState(false);
+    const [amenities, setAmenities] = useState<Amenity[]>([]);
+    const [loadingAmenities, setLoadingAmenities] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
         branchAmenityId: "",
@@ -30,6 +34,27 @@ export function AddProductModal({ isOpen, onClose, onSuccess }: AddProductModalP
     const [metaValue, setMetaValue] = useState("");
 
     const [error, setError] = useState<string | null>(null);
+
+    // Fetch amenities on mount
+    useEffect(() => {
+        const fetchAmenities = async () => {
+            setLoadingAmenities(true);
+            try {
+                const response = await amenityService.getGlobal();
+                if (response.success && response.data) {
+                    setAmenities(response.data);
+                }
+            } catch (err) {
+                console.error('Failed to fetch amenities:', err);
+            } finally {
+                setLoadingAmenities(false);
+            }
+        };
+
+        if (isOpen) {
+            fetchAmenities();
+        }
+    }, [isOpen]);
 
     const handleAddMeta = () => {
         if (metaKey && metaValue) {
@@ -116,7 +141,7 @@ export function AddProductModal({ isOpen, onClose, onSuccess }: AddProductModalP
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 placeholder="Enter product name"
-                                className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                             />
                         </div>
 
@@ -124,25 +149,28 @@ export function AddProductModal({ isOpen, onClose, onSuccess }: AddProductModalP
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
                                 <select
-                                    value={formData.category}
-                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white"
+                                    value={formData.branchAmenityId}
+                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white"
+                                    onChange={(e) => setFormData({ ...formData, branchAmenityId: e.target.value })}
+                                    disabled={loadingAmenities}
                                 >
-                                    <option value="">Select category</option>
-                                    <option value="Food">Food</option>
-                                    <option value="Drinks">Drinks</option>
-                                    <option value="Electronics">Electronics</option>
+                                    <option value="">{loadingAmenities ? 'Loading amenities...' : 'Select amenity'}</option>
+                                    {amenities.map((amenity) => (
+                                        <option key={amenity.id} value={amenity.id}>
+                                            {amenity.name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
-                            <div>
+                            {/* <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
                                 <input
                                     type="number"
                                     value={formData.stock}
                                     onChange={(e) => setFormData({ ...formData, stock: Number(e.target.value) })}
-                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                                 />
-                            </div>
+                            </div> */}
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
@@ -153,19 +181,10 @@ export function AddProductModal({ isOpen, onClose, onSuccess }: AddProductModalP
                                     value={formData.price}
                                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                                     placeholder="0.00"
-                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                                 />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Amenity ID</label>
-                                <input
-                                    type="text"
-                                    value={formData.branchAmenityId}
-                                    onChange={(e) => setFormData({ ...formData, branchAmenityId: e.target.value })}
-                                    placeholder="Branch Amenity UUID"
-                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                                />
-                            </div>
+
                         </div>
 
                         <div>
@@ -175,7 +194,7 @@ export function AddProductModal({ isOpen, onClose, onSuccess }: AddProductModalP
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 placeholder="Enter product description"
-                                className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                             />
                         </div>
 
@@ -188,14 +207,14 @@ export function AddProductModal({ isOpen, onClose, onSuccess }: AddProductModalP
                                     placeholder="Key"
                                     value={metaKey}
                                     onChange={(e) => setMetaKey(e.target.value)}
-                                    className="flex-1 rounded-md border border-gray-200 px-3 py-2 text-sm"
+                                    className="flex-1 rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900"
                                 />
                                 <input
                                     type="text"
                                     placeholder="Value"
                                     value={metaValue}
                                     onChange={(e) => setMetaValue(e.target.value)}
-                                    className="flex-1 rounded-md border border-gray-200 px-3 py-2 text-sm"
+                                    className="flex-1 rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900"
                                 />
                                 <button type="button" onClick={handleAddMeta} className="px-3 py-2 bg-gray-200 rounded-md text-sm font-medium hover:bg-gray-300">Add</button>
                             </div>

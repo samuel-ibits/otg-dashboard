@@ -95,30 +95,51 @@ export interface UpdateSubscriptionDTO extends Partial<CreateSubscriptionDTO> {
 export interface Product {
     id: string | number;
     name: string;
-    branchAmenityId: string;
     description: string;
     price: string | number;
-    meta: Record<string, any>;
-    category: string;
-    stock: number;
-    status: 'active' | 'inactive';
-    imageUrl?: string;
+    businessId: string | number;
+    branchId: string | number;
+    // branchAmenityId: string;
+    status: 'available' | 'active' | 'inactive'; // API returns 'available', keeping others for safety
+    meta: Record<string, any>; // Flexible meta field
+    category?: string; // Optional as not in recent sample response but might be useful
+    stock?: number;
+    isDeleted?: boolean;
+    rating?: number | null;
     createdAt?: string;
     updatedAt?: string;
+    deletedAt?: string | null;
+    media?: any[]; // Array for media if present
     branch_amenity?: {
-        amenityName: string;
+        id: string;
+        businessId: number;
+        branchId: number;
+        amenityId: string;
+        status: string;
+        rating: number | null;
+        totalRating: number;
+        ratingCount: number;
+        meta: any;
+        createdAt: string;
+        updatedAt: string;
+        amenity: {
+            id: string;
+            name: string; // e.g., "food"
+        };
     };
 }
 
 export interface CreateProductDTO {
     name: string;
-    branchAmenityId: string;
+    branchAmenityId?: string;
     description: string;
     price: string | number;
-    meta: Record<string, any>;
+    // meta?: Record<string, any>;
+    // fields not in the example but potentially useful to keep optional
     category?: string;
-    stock?: number;
+    // stock?: number;
     imageUrl?: string;
+    status?: 'available' | 'active' | 'inactive';
 }
 
 export interface UpdateProductDTO extends Partial<CreateProductDTO> {

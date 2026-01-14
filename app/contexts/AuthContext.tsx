@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const response = await authService.login(credentials);
 
             // Get user from response or storage
-            const loggedInUser = response.data?.user || response.user || authService.getUser();
+            const loggedInUser = response.data?.admin || response.admin || authService.getUser();
 
             if (loggedInUser) {
                 setUser(loggedInUser);

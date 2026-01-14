@@ -8,8 +8,8 @@ import type {
 } from '../types';
 
 const PRODUCT_ENDPOINTS = {
-    base: '/products',
-    byId: (id: string | number) => `/products/${id}`,
+    base: 'products',
+    byId: (id: string | number) => `products/${id}`,
 };
 
 export const productService = {
@@ -52,5 +52,17 @@ export const productService = {
      */
     async delete(id: string | number): Promise<APIResponse<void>> {
         return api.delete(PRODUCT_ENDPOINTS.byId(id));
+    },
+
+    /**
+     * Get products filtered by branch
+     */
+    async filterByBranch(
+        branchId: string | number,
+        params?: PaginationParams
+    ): Promise<APIResponse<PaginatedResponse<Product>>> {
+        const queryString = params ? buildQueryString(params) : '';
+        const separator = queryString ? '&' : '?';
+        return api.get(`${PRODUCT_ENDPOINTS.base}/branch/filter?branchId=${branchId}${queryString ? separator + queryString.slice(1) : ''}`);
     },
 };

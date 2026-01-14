@@ -67,7 +67,7 @@ export function BranchProducts({ products = [] }: BranchProductsProps) {
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 font-medium text-gray-900">₦{Number(product.price).toLocaleString()}</td>
-                                <td className="px-6 py-4">{product.branch_amenity?.amenityName}</td>
+                                <td className="px-6 py-4">{product.branch_amenity?.amenity?.name || product.category || 'N/A'}</td>
                                 <td className="px-6 py-4">
                                     <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
                                         {product.status}
