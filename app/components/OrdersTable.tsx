@@ -1,31 +1,18 @@
 "use client";
 
-import { cn } from "@/app/lib/utils";
-
 import { ActionMenu } from "./ActionMenu";
 import { Search, Filter } from "lucide-react";
-
-interface Order {
-    id: string;
-    type: string;
-    subType: string;
-    extra?: string;
-    customer: {
-        name: string;
-        handle: string;
-        avatar: string;
-    };
-    amount?: string;
-    price?: string | number;
-    date?: string;
-    createdAt?: string;
-}
+import { Order } from "@/app/lib/types";
+import { cn } from "@/app/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface OrdersTableProps {
     orders: Order[];
+    onDelete?: (id: string) => void;
 }
 
-export function OrdersTable({ orders }: OrdersTableProps) {
+export function OrdersTable({ orders, onDelete }: OrdersTableProps) {
+    const router = useRouter();
     return (
         <div className="rounded-xl border border-gray-100 bg-white shadow-sm">
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
@@ -56,46 +43,72 @@ export function OrdersTable({ orders }: OrdersTableProps) {
                             <th className="px-6 py-3 font-medium">Customers</th>
                             <th className="px-6 py-3 font-medium">Amount</th>
                             <th className="px-6 py-3 font-medium">Date</th>
+                            <th className="px-6 py-3 font-medium">Status</th>
                             <th className="px-6 py-3 font-medium"></th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {orders.map((order, index) => (
-                            <tr key={index} className="hover:bg-gray-50">
+                            <tr
+                                key={order.id}
+                                className="hover:bg-gray-50 cursor-pointer transition-colors"
+                                onClick={() => router.push(`/dashboard/orders/${order.id}`)}
+                            >
                                 <td className="px-6 py-4">{index + 1}</td>
-                                <td className="px-6 py-4 font-medium text-gray-900">{order.id}</td>
+                                <td className="px-6 py-4 font-medium text-gray-900">{order.orderId}</td>
                                 <td className="px-6 py-4">
-                                    <div className="flex items-center gap-2">
-                                        <span className="rounded bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
-                                            {order.type}
-                                        </span>
-                                        <span className="rounded bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
-                                            {order.subType}
-                                        </span>
-                                        {order.extra && (
-                                            <span className="rounded bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
-                                                {order.extra}
+                                    <div className="flex flex-wrap gap-2">
+                                        {order.amenitiesCategory.map((cat, i) => (
+                                            <span key={i} className="rounded bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 capitalize">
+                                                {cat}
                                             </span>
-                                        )}
+                                        ))}
                                     </div>
                                 </td>
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-100 text-xs font-medium text-orange-600">
-                                            {order.customer.avatar}
+                                        <div className="h-8 w-8 overflow-hidden rounded-full bg-gray-100">
+                                            {order.customer.picture ? (
+                                                <img
+                                                    src={order.customer.picture}
+                                                    alt={order.customer.user.firstName}
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="flex h-full w-full items-center justify-center bg-orange-100 text-xs font-medium text-orange-600">
+                                                    {order.customer.user.firstName[0]}{order.customer.user.lastName[0]}
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="font-medium text-gray-900">{order.customer.name}</span>
-                                            <span className="text-xs text-gray-500">{order.customer.handle}</span>
+                                            <span className="font-medium text-gray-900">
+                                                {order.customer.user.firstName} {order.customer.user.lastName}
+                                            </span>
+                                            <span className="text-xs text-gray-500">{order.customer.userName}</span>
                                         </div>
                                     </div>
                                 </td>
-                                <td className="px-6 py-4 font-medium text-gray-900">{order.price}</td>
-                                <td className="px-6 py-4">{order.createdAt}</td>
-                                <td className="px-6 py-4 text-right">
+                                <td className="px-6 py-4 font-medium text-gray-900">
+                                    {new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(order.totalAmount)}
+                                </td>
+                                <td className="px-6 py-4">
+                                    {new Date(order.createdAt).toLocaleDateString()}
+                                </td>
+                                <td className="px-6 py-4">
+                                    <span className={cn(
+                                        "rounded px-2 py-1 text-xs font-medium capitalize",
+                                        order.status === 'completed' ? "bg-green-100 text-green-700" :
+                                            order.status === 'ongoing' ? "bg-blue-100 text-blue-700" :
+                                                order.status === 'cancelled' ? "bg-red-100 text-red-700" :
+                                                    "bg-yellow-100 text-yellow-700"
+                                    )}>
+                                        {order.status}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
                                     <ActionMenu
-                                        onEdit={() => console.log("Edit order", order.id)}
-                                        onDelete={() => console.log("Delete order", order.id)}
+                                        onView={() => router.push(`/dashboard/orders/${order.id}`)}
+                                        onDelete={() => onDelete?.(order.id)}
                                     />
                                 </td>
                             </tr>
@@ -103,7 +116,6 @@ export function OrdersTable({ orders }: OrdersTableProps) {
                     </tbody>
                 </table>
             </div>
-            {/* ... (existing footer) */}
         </div>
     );
 }

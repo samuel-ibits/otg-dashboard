@@ -1,107 +1,65 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { OrdersTable } from "@/app/components/OrdersTable";
 import { Tabs } from "@/app/components/Tabs";
 import { EmptyState } from "@/app/components/EmptyState";
-
-const allOrders = [
-    {
-        id: "#OTG-98245",
-        type: "Wi-Fi",
-        subType: "Coffee",
-        customer: { name: "Sophia Williams", handle: "@sophie", avatar: "SW" },
-        amount: "₦12,500",
-        date: "28 Jan, 09:20",
-        status: "new",
-    },
-    {
-        id: "#OTG-98245",
-        type: "Wi-Fi",
-        subType: "Conference room",
-        extra: "+2",
-        customer: { name: "Emeka Nwafor", handle: "@emeka", avatar: "EN" },
-        amount: "₦14,200",
-        date: "28 Jan, 09:20",
-        status: "new",
-    },
-    {
-        id: "#OTG-98245",
-        type: "Wi-Fi",
-        subType: "Food",
-        extra: "Drinks",
-        customer: { name: "Chinedu Okafor", handle: "@chinedu", avatar: "CO" },
-        amount: "₦5,200",
-        date: "28 Jan, 09:20",
-        status: "new",
-    },
-    {
-        id: "#OTG-98245",
-        type: "Wi-Fi",
-        subType: "Coffee",
-        customer: { name: "Amina Bello", handle: "@amina", avatar: "AB" },
-        amount: "₦10,000",
-        date: "28 Jan, 09:20",
-        status: "new",
-    },
-    {
-        id: "#OTG-98245",
-        type: "Wi-Fi",
-        subType: "Lounge",
-        extra: "Food +1",
-        customer: { name: "Tunde Adeyemi", handle: "@tunde", avatar: "TA" },
-        amount: "₦17,500",
-        date: "28 Jan, 09:20",
-        status: "new",
-    },
-    {
-        id: "#OTG-98245",
-        type: "Wi-Fi",
-        subType: "Coffee",
-        customer: { name: "Fatima Abdullahi", handle: "@fatima", avatar: "FA" },
-        amount: "₦18,750",
-        date: "28 Jan, 09:20",
-        status: "new",
-    },
-    {
-        id: "#OTG-98245",
-        type: "Wi-Fi",
-        subType: "Coffee",
-        customer: { name: "Ifeoma Uche", handle: "@ifeoma", avatar: "IU" },
-        amount: "₦15,000",
-        date: "28 Jan, 09:20",
-        status: "new",
-    },
-    {
-        id: "#OTG-98245",
-        type: "Wi-Fi",
-        subType: "Coffee",
-        customer: { name: "Obinna Eze", handle: "@obinna", avatar: "OE" },
-        amount: "₦18,500",
-        date: "28 Jan, 09:20",
-        status: "new",
-    },
-    {
-        id: "#OTG-98245",
-        type: "Wi-Fi",
-        subType: "Coffee",
-        customer: { name: "Zainab Mohammed", handle: "@zainab", avatar: "ZM" },
-        amount: "₦20,500",
-        date: "28 Jan, 09:20",
-        status: "new",
-    },
-];
+import { orderService } from "@/app/lib/services/orderService";
+import { Order } from "@/app/lib/types";
 
 export default function OrdersPage() {
-    const [activeTab, setActiveTab] = useState("new");
+    const [activeTab, setActiveTab] = useState("all");
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const filteredOrders = allOrders.filter(order => order.status === activeTab);
+    const fetchOrders = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const status = activeTab === 'all' ? undefined : activeTab;
+            // Map 'new' to 'pending' if needed, or keep 'pending' as the tab value.
+            // Let's use the API status values for tabs to be safe.
+            let statusParam = status;
+            if (activeTab === 'new') statusParam = 'pending';
 
-    // Mock counts
-    const counts = {
-        new: allOrders.filter(o => o.status === 'new').length,
-        ongoing: allOrders.filter(o => o.status === 'ongoing').length,
-        completed: allOrders.filter(o => o.status === 'completed').length,
+            const response = await orderService.getBranchOrders({
+                status: statusParam,
+                limit: 50 // Fetch more to be safe for now
+            });
+
+            if (response.success) {
+                setOrders(response.data.orders);
+            } else {
+                setError(response.message || "Failed to fetch orders");
+            }
+        } catch (err: any) {
+            setError(err.message || "An error occurred while fetching orders");
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    }, [activeTab]);
+
+    useEffect(() => {
+        fetchOrders();
+    }, [fetchOrders]);
+
+    const handleDelete = async (id: string) => {
+        if (!confirm("Are you sure you want to delete this order?")) return;
+
+        try {
+            const response = await orderService.deleteOrder(id);
+            if (response.success) {
+                // Remove from local state immediately for speed, or refetch
+                setOrders(prev => prev.filter(o => o.id !== id));
+            } else {
+                alert(response.message || "Failed to delete order");
+            }
+        } catch (err) {
+            console.error("Failed to delete order", err);
+            alert("An error occurred");
+        }
     };
 
     return (
@@ -114,9 +72,11 @@ export default function OrdersPage() {
             <div className="bg-white rounded-xl border border-gray-100 p-1">
                 <Tabs
                     tabs={[
-                        { label: `New orders (${counts.new})`, value: "new" },
-                        { label: `Ongoing orders (${counts.ongoing})`, value: "ongoing" },
-                        { label: `Completed orders (${counts.completed})`, value: "completed" },
+                        { label: "All Orders", value: "all" },
+                        { label: "New (Pending)", value: "pending" },
+                        { label: "Ongoing", value: "ongoing" },
+                        { label: "Completed", value: "completed" },
+                        { label: "Cancelled", value: "cancelled" },
                     ]}
                     activeTab={activeTab}
                     onTabChange={setActiveTab}
@@ -124,13 +84,27 @@ export default function OrdersPage() {
                 />
             </div>
 
-            {filteredOrders.length > 0 ? (
-                <OrdersTable orders={filteredOrders} />
+            {loading ? (
+                <div className="flex h-64 items-center justify-center rounded-xl bg-white text-gray-500">
+                    Loading orders...
+                </div>
+            ) : error ? (
+                <div className="flex h-64 flex-col items-center justify-center gap-2 rounded-xl bg-white text-red-500">
+                    <p>{error}</p>
+                    <button
+                        onClick={() => fetchOrders()}
+                        className="text-sm text-blue-600 hover:underline"
+                    >
+                        Try again
+                    </button>
+                </div>
+            ) : orders.length > 0 ? (
+                <OrdersTable orders={orders} onDelete={handleDelete} />
             ) : (
                 <div className="bg-white rounded-xl border border-gray-100">
                     <EmptyState
-                        title="No orders yet"
-                        description="Your orders will show up here when you have metrics."
+                        title="No orders found"
+                        description="There are no orders in this category."
                     />
                 </div>
             )}

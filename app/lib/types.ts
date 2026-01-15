@@ -145,32 +145,71 @@ export interface UpdateProductDTO extends Partial<CreateProductDTO> {
 // ============================================
 
 export interface Order {
-    id: string | number;
-    customerId: string | number;
-    customerName: string;
-    items: OrderItem[];
+    id: string;
+    orderId: string;
+    customerId: number;
+    businessId: number;
+    branchId: number;
+    subTotal: number;
+    discountAmount: number;
     totalAmount: number;
-    status: 'pending' | 'processing' | 'completed' | 'cancelled';
+    voucherId: string | null;
+    voucherCode: string | null;
+    amenitiesCategory: string[];
+    status: 'pending' | 'processing' | 'completed' | 'cancelled' | 'ongoing';
     paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+    autoRenew: boolean;
+    meta: any;
     createdAt: string;
-    updatedAt?: string;
+    updatedAt: string;
+    items: OrderItem[];
+    customer: {
+        id: number;
+        picture: string;
+        userName: string;
+        user: {
+            id: number;
+            firstName: string;
+            lastName: string;
+        };
+    };
 }
 
 export interface OrderItem {
-    productId: string | number;
-    productName: string;
+    id: string;
+    orderId: string;
+    productId: number;
     quantity: number;
-    price: number;
-    subtotal: number;
+    amount: number;
+    totalAmount: number;
+    meta: any;
+    createdAt: string;
+    updatedAt: string;
+    product?: {
+        id: number;
+        name: string;
+        description: string;
+        price: number;
+        currency: string;
+        isFeatured: boolean;
+        branch_amenity: {
+            id: string;
+            amenity: {
+                id: string;
+                name: string;
+            };
+        };
+    };
 }
 
 export interface CreateOrderDTO {
-    customerId: string | number;
+    businessId: number;
+    branchId: number;
     items: Array<{
-        productId: string | number;
+        productId: number;
         quantity: number;
     }>;
-    paymentMethod?: string;
+    voucherId?: number;
 }
 
 export interface UpdateOrderDTO {
