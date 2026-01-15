@@ -21,10 +21,10 @@ export default function OrdersPage() {
             // Map 'new' to 'pending' if needed, or keep 'pending' as the tab value.
             // Let's use the API status values for tabs to be safe.
             let statusParam = status;
-            if (activeTab === 'new') statusParam = 'pending';
+            if (activeTab === 'new') statusParam = 'new';
 
             const response = await orderService.getBranchOrders({
-                status: statusParam,
+                orderStatus: statusParam,
                 limit: 50 // Fetch more to be safe for now
             });
 
@@ -73,7 +73,7 @@ export default function OrdersPage() {
                 <Tabs
                     tabs={[
                         { label: "All Orders", value: "all" },
-                        { label: "New (Pending)", value: "pending" },
+                        { label: "New (Pending)", value: "new" },
                         { label: "Ongoing", value: "ongoing" },
                         { label: "Completed", value: "completed" },
                         { label: "Cancelled", value: "cancelled" },

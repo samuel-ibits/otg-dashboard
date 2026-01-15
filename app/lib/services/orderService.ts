@@ -5,7 +5,7 @@ export const orderService = {
     /**
      * Get orders for a specific branch
      */
-    getBranchOrders: async (params: { from?: string; to?: string; status?: string; page?: number; limit?: number }) => {
+    getBranchOrders: async (params: { from?: string; to?: string; orderStatus?: string; status?: string; page?: number; limit?: number }) => {
         const queryString = buildQueryString(params);
         return api.get<{
             success: boolean;
@@ -39,7 +39,7 @@ export const orderService = {
             success: boolean;
             message: string;
             data: Order;
-        }>(`/orders/${id}/status${queryString}`);
+        }>(`/orders/${id}/orderStatus${queryString}`);
     },
 
     /**
