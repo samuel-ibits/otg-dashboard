@@ -199,11 +199,11 @@ export function ProductDrawer({ isOpen, onClose, product, onDelete, onSuccess }:
                                 <select
                                     value={formData.branchAmenityId}
                                     onChange={(e) => setFormData({ ...formData, branchAmenityId: e.target.value })}
-                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white"
+                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white "
                                 >
                                     <option value="">Select amenity</option>
                                     {amenities.map((amenity) => (
-                                        <option key={amenity.id} value={amenity.id}>
+                                        <option key={amenity.id} value={amenity.id} className="text-gray-700">
                                             {amenity.name}
                                         </option>
                                     ))}

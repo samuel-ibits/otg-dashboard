@@ -23,11 +23,11 @@ export function OrdersTable({ orders, onDelete }: OrdersTableProps) {
                         Filters
                     </button>
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-900" />
                         <input
                             type="text"
                             placeholder="Search"
-                            className="h-full w-64 rounded-lg border border-gray-200 pl-10 pr-4 text-sm outline-none placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            className="h-full w-64 rounded-lg border border-gray-200 pl-10 pr-4 text-sm outline-none placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-600"
                         />
                     </div>
                 </div>
