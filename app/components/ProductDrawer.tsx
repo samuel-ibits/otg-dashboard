@@ -67,9 +67,13 @@ export function ProductDrawer({ isOpen, onClose, product, onDelete, onSuccess }:
                         setAmenities(mappedAmenities);
                     }
                 } else {
-                    const response = await amenityService.getGlobal();
+                    const response = await amenityService.getByBranch();
                     if (response.success && response.data) {
-                        setAmenities(response.data);
+                        const mappedAmenities = response.data.map((ba: any) => ({
+                            id: ba.id, // Use branch amenity ID
+                            name: ba.amenityName,
+                        }));
+                        setAmenities(mappedAmenities);
                     }
                 }
             } catch (err) {

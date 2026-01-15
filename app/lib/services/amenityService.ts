@@ -19,7 +19,7 @@ export const amenityService = {
         return api.get('/amenities/global', { useAdmin: false });
     },
 
-    async getByBranch(branchId: string | number): Promise<APIResponse<BranchAmenity[]>> {
+    async getByBranch(branchId?: string | number): Promise<APIResponse<BranchAmenity[]>> {
         return api.get(`/amenities/branch/${branchId}`, { useAdmin: false });
     },
 
