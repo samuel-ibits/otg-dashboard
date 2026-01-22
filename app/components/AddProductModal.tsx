@@ -41,6 +41,7 @@ export function AddProductModal({ isOpen, onClose, onSuccess, branchId }: AddPro
         const fetchAmenities = async () => {
             setLoadingAmenities(true);
             try {
+                console.log(branchId);
                 if (branchId) {
                     const response = await amenityService.getByBranch(branchId);
                     if (response.success && response.data) {
@@ -162,13 +163,13 @@ export function AddProductModal({ isOpen, onClose, onSuccess, branchId }: AddPro
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
                                 <select
                                     value={formData.branchAmenityId}
-                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white"
+                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:text-gray-900 bg-white"
                                     onChange={(e) => setFormData({ ...formData, branchAmenityId: e.target.value })}
                                     disabled={loadingAmenities}
                                 >
                                     <option value="">{loadingAmenities ? 'Loading amenities...' : 'Select amenity'}</option>
                                     {amenities.map((amenity) => (
-                                        <option key={amenity.id} value={amenity.id}>
+                                        <option key={amenity.id} value={amenity.id} className="text-gray-900 bg-white">
                                             {amenity.name}
                                         </option>
                                     ))}

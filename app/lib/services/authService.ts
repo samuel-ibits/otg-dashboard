@@ -17,6 +17,7 @@ export interface AuthUser {
     email: string;
     name?: string;
     role?: string;
+    branchId?: string;
     [key: string]: any; // Allow additional fields from API
 }
 
